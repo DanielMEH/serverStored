@@ -290,6 +290,7 @@ public async getAdminData(req: any,
         refreshToken: req.body.refreshToken,
       };
       
+      console.log("hello");
       
       if ( verifyToken?.id ) {
         const fecha = momet().format("YYYY-MM-DD");
@@ -302,6 +303,7 @@ public async getAdminData(req: any,
           for ( let i = 0; i < rows.length; i++ ) {
             if ( rows[i].correo == data.correo )
               return res.json( { message: "ERR_MAIL_EXIST_USER", status: 302 } );
+          
           }
          
           
