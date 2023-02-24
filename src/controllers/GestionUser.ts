@@ -47,11 +47,13 @@ public async getAdminData(req: any,
 
 
   }
-  public async RegisterUser(
+  public async AdminRegister(
     req: any,
     res: Response,
     next: Partial<NextFunction>
   ): Promise<Response | Request | any> {
+    console.log(req.body);
+    
     try {
 
       const data: PersonRegister = {
@@ -63,6 +65,7 @@ public async getAdminData(req: any,
         nameRol: "superAdmin"
         
       };
+      
       const fecha = momet().format("YYYY-MM-DD");
       const hora = momet().format("HH:mm:ss");
         const roundNumber = 10;
@@ -78,7 +81,9 @@ public async getAdminData(req: any,
           }
            conn.query(
             `CALL ADMIN_INSERT_ACCOUNT('${data.correo}','${hasPassword}','${state}','${fecha}','${hora}','${data.nameRol}','${req.body.postDataAdmin.toggle}')`,
-            ( error: Array<Error> | any, rows: any ) => {
+            ( error: Array<Error> | any, rows: any,fields ) => {
+              
+              
               if ( error ) {
                 return res.status(401).json( { message: "ERROR_DATA_ADMIN", error: error } );
               }
@@ -113,6 +118,8 @@ public async getAdminData(req: any,
     next: Partial<NextFunction>
   ): Promise<Response | Request | any> {
 
+    console.log("hello");
+    
     try {
       const data: login = {
         correo: req.body.postDataUser.email,
@@ -123,8 +130,9 @@ public async getAdminData(req: any,
       };
 
 
-      const conn = await conexion.connect();
       console.log("email: ", data.correo);
+      const conn = await conexion.connect();
+      
       
       
       conn.query(
@@ -132,6 +140,7 @@ public async getAdminData(req: any,
         async ( error: Array<Error> | any, rows: any ) => {
           if ( error ) return res.status( 400 ).json( { message: "ERROR_DB", error: error } );
           if ( rows[0].length > 0 ) {
+            
             const user = rows[0][0];
             const validPassword = await bcrypt.compare( data.password, user.password );
            if ( validPassword ) {
@@ -183,9 +192,11 @@ public async getAdminData(req: any,
                  conn.query("SELECT idUsers,rol FROM admin WHERE correo = ?",
                          [email], async ( error: Array<Error> | any, rows: any ) => {
                             if ( error ) return res.status( 400 ).json( { message: "ERROR_DB", error: error } );
+                           
+                            
                            if ( rows.length > 0 ) {
                               const token: any = jwt.sign(
-                                    { id: rows[0].idAdmin },
+                                    { id: rows[0].idUsers },
                                     SECRET || "tokenGenerate",
                                     { expiresIn: 60 * 60 * 24 }
                              );
@@ -244,6 +255,9 @@ public async getAdminData(req: any,
   ): Promise<Response | Request | any> {
     try {
       let tokenIdAcc: any = req.headers["acc-token-data"];
+      
+      
+      
 
       const verifyToken: Array<any> | any = jwt.verify( tokenIdAcc, SECRET )!;
 
@@ -257,13 +271,16 @@ public async getAdminData(req: any,
     }
   }
 
-  public async loginUser(
+  public async RegisterUsuario(
     req: Partial<any>,
     res: Response,
     next: Partial<NextFunction>
   ): Promise<Response | Request | any> {
+    
+    
     try {
       let tokenIdAcc: any = req.headers["acc-token-data"];
+      
       const verifyToken: Array<any> | any = jwt.verify( tokenIdAcc, SECRET )!;
       const data: login = {
         correo: req.body.postDataUserRegister.email ,
@@ -273,56 +290,44 @@ public async getAdminData(req: any,
         refreshToken: req.body.refreshToken,
       };
       
-      console.log(req.body);
       
       if ( verifyToken?.id ) {
-        console.log(verifyToken?.id);
-        
+        const fecha = momet().format("YYYY-MM-DD");
+        const hora = momet().format("HH:mm:ss")
         const roundNumber = 10;
         const encriptarPassword = await bcrypt.genSalt( roundNumber );
         const hasPassword = await bcrypt.hash( data.password, encriptarPassword );
         const conn = await conexion.connect();
-        conn.query( "SELECT * FROM usuario", async ( error, rows ) => {
+        conn.query( "SELECT * FROM account", async ( error, rows ) => {
           for ( let i = 0; i < rows.length; i++ ) {
             if ( rows[i].correo == data.correo )
               return res.json( { message: "ERR_MAIL_EXIST_USER", status: 302 } );
           }
-          await conn.query(
-            `INSERT INTO usuario (correo,password ,rol, estado, idAdminUser) VALUES (?,?,?,?,?)`,
-            [
-              
-              data.correo,
-               hasPassword, 
-               req.body.postDataUserRegister.rol,
-               req.body.postDataUserRegister.estado,           
-               verifyToken?.id,
-            ],
-            ( error: Array<Error> | any, rows: any ) => {
-              console.log( error );
-              console.log( rows );
-              if ( error )
-                return res.json( { message: "ERROR_DATA_USER", error: error } );
-              if ( rows ) {
-                const tokenId: any = jwt.sign(
-                  { id: data.correo },
-                  SECRET || "tokenGenerate",
-                  { expiresIn: 60 * 60 * 24 }
-                );
+         
+          
 
-                return res.json( {
-                  message: "USER_CREATE_SUCCESFULLY",
-                  tokenId,
-                } );
-              }
+          conn.query(
+            `CALL CREATE_USER('${data.correo}','${hasPassword}','${fecha}','${verifyToken.id}','${hora}')`,(error,rows) => {
+              console.log(error);
+              console.log(rows);
+              
+              
+
             }
           );
+          
         } );
       }else{
+        console.log("error");
+        
         return res.status(401).json({message:"N0T_ALLOWED"})
+
       }
        
       
     } catch ( error ) {
+      console.log("error");
+      
       res.status( 400 ).send( { message: "NOT_AUTORIZED" } );
     }
   }

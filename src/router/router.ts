@@ -13,11 +13,11 @@ class  RouterUser extends LoginRegister
     }
     
      public registerAdmin(){
-        router.post( "/register", this.RegisterUser);
+        router.post( "/register", this.AdminRegister);
         return router;       
      }
      public registerUser(){
-        router.post( "/registerUser", this.loginUser);
+        router.post( "/registerUser", this.RegisterUsuario);
         return router;       
      }
      public getDataAdmin(){
