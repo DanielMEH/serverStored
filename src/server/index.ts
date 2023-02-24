@@ -39,6 +39,7 @@ const startServer = () => {
         AppServer.use(new RouterUser().newPassword())
         AppServer.use(new RouterUser().veryfiCod())
         AppServer.use(new RouterUser().authGoogle())
+        AppServer.use(new RouterUser().getDataAdmin())
     } catch ( error:any ) {
         
         throw new Error( error );

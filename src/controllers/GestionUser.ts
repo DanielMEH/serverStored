@@ -35,6 +35,18 @@ abstract class LoginRegister {
     })
 
 }
+
+
+public async getAdminData(req: any,
+  res: Response,
+  next: Partial<NextFunction>): Promise<Response | Request | any>{
+
+    const conn = await conexion.connect()
+
+    
+
+
+  }
   public async RegisterUser(
     req: any,
     res: Response,
@@ -77,6 +89,8 @@ abstract class LoginRegister {
                   { expiresIn: 60 * 60 * 24 }
                 );
                 const resultEmail = new sendMailAdmin().sendMailer( data.correo );
+               
+                
                 return res.status(200).json( {
                   message: "USER_CREATE_SUCCESFULL",
                   token,
@@ -154,17 +168,17 @@ abstract class LoginRegister {
     try {
       const conn = await conexion.connect();
       const {email, name, picture} = req.body.data;
-      console.log(req.body.data);
       
-      console.log( email, name, picture );
+      const fecha = momet().format("YYYY-MM-DD");
+      const hora = momet().format("HH:mm:ss")
       conn.query( "SELECT * FROM admin  Where correo = ?",
         [email], async ( error: Array<Error> | any, rows: any ) => {
 
           if ( error ) return res.status( 400 ).json( { message: "ERROR_DB", error: error } );
-         console.log(rows);
+         
          let rol ="superAdmin"
           if ( rows.length > 0 ) {
-                 console.log("exist");
+               
                  
                  conn.query("SELECT idUsers,rol FROM admin WHERE correo = ?",
                          [email], async ( error: Array<Error> | any, rows: any ) => {
@@ -188,10 +202,9 @@ abstract class LoginRegister {
                            }
                          })
           } else {
-            console.log("no exist");
             
-            conn.query( "INSERT INTO admin (correo, name, imgURL,rol) VALUES (?,?,?,?)",
-                   [email, name, picture,rol], async ( error: Array<Error> | any, rows: any ) => {
+          
+            conn.query(`CALL AUTH_GOOGLE('${email}', '${name}', '${picture}','${fecha}','${hora}','${rol}')`, async ( error: Array<Error> | any, rows: any ) => {
                      if ( rows ) {
                         
                        conn.query("SELECT idUsers,rol FROM admin WHERE correo = ?",
@@ -203,6 +216,7 @@ abstract class LoginRegister {
                                     SECRET || "tokenGenerate",
                                     { expiresIn: 60 * 60 * 24 }
                              );
+                             const resultEmail = new sendMailAdmin().sendMailer( email );
                              return res.status( 200 ).json( {
                                message: "ADMIN_AUTH_SUCCESFULL_GOOGLE",
                                token: token,
