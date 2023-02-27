@@ -25,13 +25,7 @@ const startServer = () => {
             console.log( "connection in the port: :", PORT );
         
         } )
-        AppServer.use( fileUpload( {
-            useTempFiles: true,
-            createParentPath: true,
-            safeFileNames: true,
-            preserveExtension: true,
-            tempFileDir: path.join( __dirname, "tmp" )
-        } ) )
+       
         AppServer.use(new RouterUser().registerAdmin()); 
         AppServer.use(new RouterUser().registerUser()); 
         AppServer.use(new RouterUser().Login());  
@@ -40,6 +34,10 @@ const startServer = () => {
         AppServer.use(new RouterUser().veryfiCod())
         AppServer.use(new RouterUser().authGoogle())
         AppServer.use(new RouterUser().getDataAdmin())
+        AppServer.use(new RouterUser().uploadCsvUsers())
+        AppServer.use(new RouterUser().getUsersAdmin())
+        AppServer.use(new RouterUser().UsersDelete())
+        AppServer.use(new RouterUser().GetCountUsers())
     } catch ( error:any ) {
         
         throw new Error( error );

@@ -7,6 +7,8 @@ import {
   forgotPassword,
   newPasswordAdmin,
 } from "../interfaces/users";
+import fs from 'fs-extra'
+import csvtojson from "csvtojson";
 import { conexion } from "../database/database";
 import jwt from "jsonwebtoken";
 import { SECRET } from "../config/config"; // <--- this is the problem
@@ -14,9 +16,10 @@ import { sendMailAdmin } from "../libs/libs";
 import { recoveryAdminPass } from "../libs/forGotPassword";
 import { authUser } from "../auth/authUser";
 import { recoveryUserPass } from "../libs/forgotPassUser";
-import moment from "moment-es6";
+import moment from 'moment-with-locales-es6';
 // import { newPasswordUser } from "../interfaces/users";
 let momet:any = moment
+moment.locale("es");
 abstract class LoginRegister {
 
   public async veryfidCode(req: Request,
@@ -130,7 +133,6 @@ public async getAdminData(req: any,
       };
 
 
-      console.log("email: ", data.correo);
       const conn = await conexion.connect();
       
       
@@ -178,20 +180,22 @@ public async getAdminData(req: any,
       const conn = await conexion.connect();
       const {email, name, picture} = req.body.data;
       
-      const fecha = momet().format("YYYY-MM-DD");
-      const hora = momet().format("HH:mm:ss")
+      const fecha = momet().format('MMMM Do YYYY');
+      const hora = momet().format('h:mm:ss a');
       conn.query( "SELECT * FROM admin  Where correo = ?",
         [email], async ( error: Array<Error> | any, rows: any ) => {
 
           if ( error ) return res.status( 400 ).json( { message: "ERROR_DB", error: error } );
          
          let rol ="superAdmin"
+         let estado = "activo"
           if ( rows.length > 0 ) {
                
                  
                  conn.query("SELECT idUsers,rol FROM admin WHERE correo = ?",
                          [email], async ( error: Array<Error> | any, rows: any ) => {
                             if ( error ) return res.status( 400 ).json( { message: "ERROR_DB", error: error } );
+                          conn.query(`UPDATE admin SET estado = '${estado}' WHERE correo = '${email}'`)
                            
                             
                            if ( rows.length > 0 ) {
@@ -218,12 +222,14 @@ public async getAdminData(req: any,
             conn.query(`CALL AUTH_GOOGLE('${email}', '${name}', '${picture}','${fecha}','${hora}','${rol}')`, async ( error: Array<Error> | any, rows: any ) => {
                      if ( rows ) {
                         
-                       conn.query("SELECT idUsers,rol FROM admin WHERE correo = ?",
+                       conn.query("SELECT idUsers ,rol FROM admin WHERE correo = ?",
                          [email], async ( error: Array<Error> | any, rows: any ) => {
+                          
+                          
                             if ( error ) return res.status( 400 ).json( { message: "ERROR_DB", error: error } );
                            if ( rows.length > 0 ) {
                               const token: any = jwt.sign(
-                                    { id: rows[0].idAdmin },
+                                    { id: rows[0].idUsers  },
                                     SECRET || "tokenGenerate",
                                     { expiresIn: 60 * 60 * 24 }
                              );
@@ -277,11 +283,13 @@ public async getAdminData(req: any,
     next: Partial<NextFunction>
   ): Promise<Response | Request | any> {
     
+    console.log("hola");
     
     try {
       let tokenIdAcc: any = req.headers["acc-token-data"];
-      
       const verifyToken: Array<any> | any = jwt.verify( tokenIdAcc, SECRET )!;
+      console.log(verifyToken);
+      
       const data: login = {
         correo: req.body.postDataUserRegister.email ,
         password: req.body.postDataUserRegister.password,
@@ -289,12 +297,19 @@ public async getAdminData(req: any,
         token: req.body.token,
         refreshToken: req.body.refreshToken,
       };
-      
-      console.log("hello");
+      const permisions={
+
+        delete:"eliminar",
+        editar:"editar",
+        crear:"crear",
+        leer:"leer",
+        state:"Inactivo"
+      }
+      console.log(req.body);
       
       if ( verifyToken?.id ) {
-        const fecha = momet().format("YYYY-MM-DD");
-        const hora = momet().format("HH:mm:ss")
+        const fecha = momet().format('MMMM Do YYYY');
+        const hora = momet().format('h:mm:ss a');
         const roundNumber = 10;
         const encriptarPassword = await bcrypt.genSalt( roundNumber );
         const hasPassword = await bcrypt.hash( data.password, encriptarPassword );
@@ -305,31 +320,85 @@ public async getAdminData(req: any,
               return res.json( { message: "ERR_MAIL_EXIST_USER", status: 302 } );
           
           }
-         
-          
-
           conn.query(
-            `CALL CREATE_USER('${data.correo}','${hasPassword}','${fecha}','${verifyToken.id}','${hora}')`,(error,rows) => {
-              console.log(error);
-              console.log(rows);
-              
-              
+            `CALL CREATE_USER('${data.correo}','${hasPassword}','${fecha}','${verifyToken.id}','${hora}','${req.body.postDataUserRegister.estado}')`,
+            (error,rows) => {
+             if (rows) {
 
+              conn.query(`CALL GET_USER_SECOND_USER('${data.correo}')`,(error,rows)=>{
+               
+                
+                if (rows) {
+                 
+                 conn.query(`CALL INSERT_MODULE_USER('${req.body.postDataUserRegister.modulo}','${req.body.postDataUserRegister.modulo}','${rows[0][0].idAccount}')`,
+                 (error,rowsid)=>{
+                    if (rowsid) {
+
+                     conn.query(`CALL GET_MODULE_ACCOUNT_USER('${rows[0][0].idAccount}')`,
+                     (error,rowsData)=>{
+                      
+                      
+                     if (rowsData) {
+                      conn.query(`CALL ASIGNED_PERMISION_USER_ACCOUNT('${rowsData[0][0].IDmodulo}','${permisions.editar}','${permisions.editar}','${permisions.state}')`,
+                      (error,rowsData)=>{
+                        if (rowsData) {
+                       
+                          conn.query(`CALL GET_USER_CREATE('${data.correo}')`,(error,rows)=>{
+
+                            return res.status( 201 ).json( {
+                              message: "USER_REGISTER_SUCCESFULL",
+                              status: 201,
+                              data:rows
+                            });
+                          })
+                        }else{
+                         
+                          
+                          return res.status( 400 ).json( {
+                            message: "USER_REGISTER_ERROR",
+                            status: 400,
+                          });
+                        }
+
+
+                      })
+
+                     }else{
+                      return res.status( 400 ).json( {
+                        message: "USER_REGISTER_ERROR",
+                        status: 400,
+                      });
+                     }
+                     })                   
+                    }else{
+              
+                      
+                      return res.status( 400 ).json( {
+                        message: "USER_REGISTER_ERROR",
+                        status: 400,
+                      });
+                    }
+
+                 })
+                }
+
+              })
+           
+              
+             }else{
+              return   res.status(400).json({message:"USER_REGISTER_ERROR",status:400})
+             }
             }
           );
           
         } );
-      }else{
-        console.log("error");
-        
+      }else{ 
         return res.status(401).json({message:"N0T_ALLOWED"})
 
       }
-       
+   
       
     } catch ( error ) {
-      console.log("error");
-      
       res.status( 400 ).send( { message: "NOT_AUTORIZED" } );
     }
   }
@@ -487,6 +556,208 @@ public async getAdminData(req: any,
       return res.status( 400 ).json( { error } );
     }
   }
-}
+  public async uploadusersCsv(req: Request|any,
+    res: Response,
+    next: Partial<NextFunction>): Promise<Response | Request | any> {
+     
+      
+      
+      const fecha = momet().format('MMMM Do YYYY');
+      const hora = momet().format('h:mm:ss a');
+        const permisions={
 
+          delete:"eliminar",
+          editar:"editar",
+          crear:"crear",
+          leer:"leer",
+          state:"Inactivo"
+        }
+       let tokenIdAcc: any = req.headers["acc-token-data"];
+       const verifyToken: Array<any> | any = jwt.verify( tokenIdAcc, SECRET )!;
+       const { id } = verifyToken;
+       
+       if(id){
+         const roundNumber = 10;
+         const encriptarPassword = await bcrypt.genSalt( roundNumber );
+         const conn = await conexion.connect();
+         
+         
+        if (req.files?.archivousuariocsv) {
+          let fileName = req.files?.archivousuariocsv?.tempFilePath!;
+         
+          csvtojson().
+          fromFile(fileName).
+          then(async(source: any) => {
+            let users = 1;
+            for (let i = 0; i < source.length; i++) {
+              let correo = source[i]["correo"],
+                password = source[i]["password"];
+                  const hasPassword = await bcrypt.hash( password, encriptarPassword );
+                  conn.query( "SELECT * FROM account", async ( error, rows ) => {
+                    for ( let i = 0; i < rows.length; i++ ) {
+                      if ( rows[i].correo == correo )
+                        return res.json( { message: "ERR_MAIL_EXIST_USER", status: 302 } );
+                    }
+                    conn.query(
+                      `CALL CREATE_USER('${correo}','${hasPassword}','${fecha}','${id}','${hora}','${req.body['formDataCsv[estado]']}')`,
+                      (error,rows) => {
+                       if (rows) {
+                        conn.query(`CALL GET_USER_SECOND_USER('${correo}')`,(error,rows)=>{
+                          if (rows) {
+                           
+                           conn.query(`CALL INSERT_MODULE_USER('${req.body['formDataCsv[modulo]']}','${req.body['formDataCsv[modulo]']}','${rows[0][0].idAccount}')`,
+                           (error,rowsid)=>{
+                              if (rowsid) {
+          
+                               conn.query(`CALL GET_MODULE_ACCOUNT_USER('${rows[0][0].idAccount}')`,
+                               (error,rowsData)=>{                         
+                               if (rowsData) {
+                                conn.query(`CALL ASIGNED_PERMISION_USER_ACCOUNT('${rowsData[0][0].IDmodulo}','${permisions.editar}','${permisions.editar}','${permisions.state}')`,
+                                (error,rowsData)=>{                              
+                                })
+                               }
+                               })                   
+                              }
+          
+                           })
+                          }
+          
+                        })    
+                        
+                       }else{
+                      
+                            return   res.status(400).json({message:"USER_REGISTER_ERROR",status:400,data:rows})
+
+                       }
+                      }
+                    );
+                    
+                  } );
+                  
+            }
+
+           await fs.remove(req.files?.archivousuariocsv?.tempFilePath)
+           conn.query(
+            `CALL GET_USER('${id}')`,(error,rows)=>{
+              return res.status( 201 ).json( {
+                message: "USER_REGISTER_SUCCESFULL",
+                status: 201,
+                data: rows,
+              });
+
+            })
+          })
+        }else{
+          await fs.remove(req.files?.archivousuariocsv?.tempFilePath)
+         return  res.send("no subio el documento")
+        }
+       }else{
+        await fs.remove(req.files?.archivousuariocsv?.tempFilePath)
+          return res.status( 400 ).json( { message: "ERROR_SESSION" } );
+       }
+
+  }
+
+  public  async getUsersAdminData(req: Request|any,
+    res: Response,
+    next: Partial<NextFunction>): Promise<Response | Request | any> {
+      
+    try {
+      const verifyToken: Array<any> | any = jwt.verify( req.params.idToken, SECRET )!;
+      const { id } = verifyToken;
+      
+      if(id){
+
+        const conn = await conexion.connect();
+        conn.query(
+          `CALL GET_USER('${id}')`,
+          ( error, rows ) => {
+            if ( error )return res.status(500).json( { message: "ERROR_GET_USERS_ADMIN_DATA", error } );
+            if ( rows ) {
+              return res.status(200).json( { message: "GET_USERS_ADMIN_DATA", data:rows[0] } );
+            }
+          }
+        );
+      }else{
+        return res.status(400).json( { message: "ERROR_SESSION" } );
+      }
+    } catch ( error ) {
+      return res.status( 400 ).json( { error } );
+    }
+  }
+  public async deleteAllUsers(
+    req: Request | any,
+    res: Response,
+    next: Partial<NextFunction>
+  ):Promise< Request|Response |any>{
+    try {
+      
+      let tokenIdAcc: any = req.headers["isallowed-x-token"];
+      console.log(tokenIdAcc);
+      
+      const verifyToken: Array<any> | any = jwt.verify( tokenIdAcc, SECRET )!;
+      const { id } = verifyToken;
+      console.log(req.body);
+      
+      if(id){
+         const conn = await conexion.connect();     
+         conn.query(`CALL SELECT_ALL_MODULE_USERS('${req.body.deleteData}')`,(error,rows)=>{
+           conn.query(`CALL DELETE_ALL_USERS('${req.body.deleteData}','${rows[0][0].IDmodulo }')`,(error,rows)=>{
+            
+            
+            if (rows) {
+             return res.status(200).json( { message: "DELETE_ALL_USERS" } );
+            }else{
+              return res.status(400).json( { message: "ERROR_DELETE_ALL_USERS" } );
+            }
+          })
+
+         })
+      }else{
+        return res.status(400).json( { message: "ERROR_SESSION" } );
+      }
+    } catch (error) {
+      return res.status(400).json( { message: "ERROR_SESSION" } );
+    }
+
+  }
+
+  public async CountUsersAll(req: Request | any,
+    res: Response,
+    next: Partial<NextFunction>):Promise< Request|Response |any>{
+    try {
+      console.log("Hola");
+      
+      const verifyToken: Array<any> | any = jwt.verify( req.params.idToken, SECRET )!;
+      const { id } = verifyToken;
+      console.log(id);
+      
+      if(id){
+        const conn = await conexion.connect();
+        conn.query(`CALL GET_COUNT_USERS('${id}')`,(error,rows)=>{
+          conn.query(`CALL COUNT_STATE_USER('${id}')`,(error,rowsActive)=>{
+            conn.query(`CALL COUNT_STATE_USER_INACTIVO('${id}')`,(error,rowsInactive)=>{
+              if (rows) {
+                return res.status(200).json( { message: "COUNT_USERS_ALL",countUsers:rows[0][0].total,
+              stateActive:rowsActive[0][0].totalActive, stateInactive:rowsInactive[0][0].totalActive } );
+              }else{
+                return res.status(400).json( { message: "ERROR_COUNT_USERS_ALL" } );
+              }
+
+            })
+
+          })
+        })
+      }
+
+    } catch (error) {
+      res.send("error")
+      console.log(error);
+      
+      return error
+    }
+
+
+  }
+}
 export default LoginRegister;

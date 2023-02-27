@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { Request, Response, NextFunction } from "express";
 import LoginRegister from "../controllers/GestionUser";
-
+import fileUpload from "express-fileupload"
 const router: Router = Router();
-
+import path from "path"
 class  RouterUser extends LoginRegister
 {
     public Login() {
@@ -40,6 +40,28 @@ class  RouterUser extends LoginRegister
    }
    public authGoogle(){
        return router.post("/authgoogleAccount",this.passpAuthGoogle)
+     }
+   public uploadCsvUsers(){
+       return router.post("/uploadcsvUsers",fileUpload( {
+         useTempFiles: true,
+         
+         tempFileDir: path.join( __dirname, "/uploadcsv" )
+     } ),this.uploadusersCsv)
+     }
+     public getUsersAdmin(){
+      return router.get("/getUsersData/:idToken",this.getUsersAdminData)
+
+
+     }
+     public UsersDelete(){
+      return router.post("/deleteUser",this.deleteAllUsers)
+
+
+     }
+     public GetCountUsers(){
+      return router.get("/countUsers/:idToken",this.CountUsersAll)
+
+
      }
  
     }
