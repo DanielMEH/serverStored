@@ -177,8 +177,13 @@ public async getAdminData(req: any,
     res: Response,
     next: Partial<NextFunction> ): Promise<Response | Request | any>{
     try {
+      console.log("Hola");
+      console.log(req.body);
+      
+      
       const conn = await conexion.connect();
       const {email, name, picture} = req.body.data;
+      console.log(email, name, picture);
       
       const fecha = momet().format('MMMM Do YYYY');
       const hora = momet().format('h:mm:ss a');
@@ -218,9 +223,14 @@ public async getAdminData(req: any,
                          })
           } else {
             
+          console.log("create");
           
             conn.query(`CALL AUTH_GOOGLE('${email}', '${name}', '${picture}','${fecha}','${hora}','${rol}')`, async ( error: Array<Error> | any, rows: any ) => {
+              console.log(rows);
+              console.log(error);
+              
                      if ( rows ) {
+                      
                         
                        conn.query("SELECT idUsers ,rol FROM admin WHERE correo = ?",
                          [email], async ( error: Array<Error> | any, rows: any ) => {
