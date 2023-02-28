@@ -121,7 +121,7 @@ public async getAdminData(req: any,
     next: Partial<NextFunction>
   ): Promise<Response | Request | any> {
 
-    console.log("hello");
+    console.log("hello mi account");
     
     try {
       const data: login = {
@@ -131,12 +131,7 @@ public async getAdminData(req: any,
         token: req.body.token,
         refreshToken: req.body.refreshToken,
       };
-
-
       const conn = await conexion.connect();
-      
-      
-      
       conn.query(
         `CALL ADMIN_AUTH_LOGIN('${data.correo}')`,
         async ( error: Array<Error> | any, rows: any ) => {
@@ -162,9 +157,32 @@ public async getAdminData(req: any,
               
            
       }else
-      return res.status(400).json( { message: "ERROR_AUTH_ADMIN" } );
-      
-        
+     console.log("login");
+      conn.query(`CALL USER_LOGIN('${data.correo}')`,async(error,rows)=>{
+        if (error) return res.status(400).json({message:"ERROR_DB",error:error})
+        const validPassword = await bcrypt.compare( data.password, rows[0][0].password );
+        if ( validPassword ) {
+          conn.query(`CALL USER_LOGIN_MODULO('${rows[0][0].idAccount}')`,(error,rows)=>{
+             if (error) return res.status(400).json({message:"ERROR_DB",error:error})
+             let modulo = rows[0]
+             console.log(modulo);
+             
+          })
+         console.log(rows[0][0].idUsers);
+         const token: any = jwt.sign({id:rows[0][0].idUsers},
+           SECRET || "authToken",
+           {expiresIn: 60 * 60 * 24}
+         
+         );
+         return res.status(200).json({message:"LOGIN_SUCCESSFULL",token,auth:true,
+       rol:rows[0][0].rol})
+         
+
+        }else{
+           return res.status(401).json({message:"ERROR_PASSWORD"})
+        }
+      })
+           
      } );
     } catch ( error ) {
 
