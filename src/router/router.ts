@@ -63,7 +63,34 @@ class  RouterUser extends LoginRegister
 
 
      }
- 
+
+     public GetModuleUsers(){
+      return router.get("/getModuleUsers/:id",this.getModuleUsers)
+     }
+
+     public GetPermisions(){
+      return router.get("/getPermisions/:idModule",this.getPermisions)
+     }
+
+     public UpdateAdmin(){
+      return router.post("/updateAdmin",this.updateAdmin)
+     }
+
+     public DeleteModuleUser(){
+      return router.post("/deleteModuleUser/:idmodule",this.deleteModule)
+     }
+     
+     public SetModuleUsers(){
+      return router.post("/setModule/:idUsers",this.setModule)
+     }
+
+     public SetPermisionModule(){
+      return router.post("/setPermisionModule/:idModule",this.setPermisionModule)
+     }
+
+     public DeletePermisionModule(){
+      return router.post("/deletePermisionModule/:idModule",this.deletePermisionModule)
+     }
     }
     
 

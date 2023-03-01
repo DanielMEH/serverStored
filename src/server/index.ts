@@ -38,6 +38,15 @@ const startServer = () => {
         AppServer.use(new RouterUser().getUsersAdmin())
         AppServer.use(new RouterUser().UsersDelete())
         AppServer.use(new RouterUser().GetCountUsers())
+        // Here go the Roustes of sydtem control users
+        AppServer.use(new RouterUser().GetModuleUsers())
+        AppServer.use(new RouterUser().GetPermisions())
+        AppServer.use(new RouterUser().UpdateAdmin())
+        AppServer.use(new RouterUser().DeleteModuleUser())
+        AppServer.use(new RouterUser().SetModuleUsers())
+        AppServer.use(new RouterUser().SetPermisionModule())
+        AppServer.use(new RouterUser().DeletePermisionModule())
+
     } catch ( error:any ) {
         
         throw new Error( error );

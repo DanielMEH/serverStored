@@ -148,7 +148,7 @@ public async getAdminData(req: any,
             
             );
             return res.status(200).json({message:"LOGIN_SUCCESSFULL",token,auth:true,
-          rol:rows[0][0].rol})
+          rol:rows[0][0].rol,type:"admin"})
             
 
            }else{
@@ -162,21 +162,26 @@ public async getAdminData(req: any,
         if (error) return res.status(400).json({message:"ERROR_DB",error:error})
         const validPassword = await bcrypt.compare( data.password, rows[0][0].password );
         if ( validPassword ) {
-          conn.query(`CALL USER_LOGIN_MODULO('${rows[0][0].idAccount}')`,(error,rows)=>{
+          conn.query(`CALL USER_LOGIN_MODULO('${rows[0][0].idAccount}')`,(error,rowsP)=>{
              if (error) return res.status(400).json({message:"ERROR_DB",error:error})
-             let modulo = rows[0]
-             console.log(modulo);
+             let modulo = rowsP[0]
+             console.log("inventario",modulo);
+             
+            console.log(rows);
+            
+             console.log(rows[0][0].idAccount);
+             const token: any = jwt.sign({id:rows[0][0].idAccount},
+               SECRET || "authToken",
+               {expiresIn: 60 * 60 * 24}
+             
+             );
+       
+             
+             return res.status(200).json({message:"LOGIN_SUCCESSFULL",token,auth:true,
+           module:modulo,type:"user"})
+             
              
           })
-         console.log(rows[0][0].idUsers);
-         const token: any = jwt.sign({id:rows[0][0].idUsers},
-           SECRET || "authToken",
-           {expiresIn: 60 * 60 * 24}
-         
-         );
-         return res.status(200).json({message:"LOGIN_SUCCESSFULL",token,auth:true,
-       rol:rows[0][0].rol})
-         
 
         }else{
            return res.status(401).json({message:"ERROR_PASSWORD"})
@@ -786,6 +791,197 @@ public async getAdminData(req: any,
     }
 
 
+
   }
-}
+  // Here go the part of module,permisions
+  public async getModuleUsers(
+    req: Request | any,
+    res: Response,
+    next: Partial<NextFunction>
+  ):Promise< Request|Response |any>{
+    try {
+      const verifyToken: Array<any> | any = jwt.verify( req.params.idToken, SECRET )!;
+      const { id } = verifyToken;
+      if(id){
+        const conn = await conexion.connect();
+        conn.query(`CALL GET_MODULE_ACCOUNT_USER('${id}')`,(error,rows)=>{
+          if (rows) {
+            return res.status(200).json( { message: "GET_MODULE_USER",data:rows[0] } );
+          }else{
+            return res.status(400).json( { message: "ERROR_GET_MODULE_USER" } );
+          }
+        })
+      }
+
+    } catch (error) {
+      res.send("error")
+      console.log(error);
+      
+      return error
+    }
+  }
+
+  public async getPermisions(
+    req: Request | any,
+    res: Response,
+    next: Partial<NextFunction>
+  ):Promise< Request|Response |any>{
+    try {
+      const verifyToken: Array<any> | any = jwt.verify( req.params.idModule, SECRET )!;
+      const { id } = verifyToken;
+      if(id){
+        const conn = await conexion.connect();
+        conn.query(`CALL GET_PERMISIONS_MODULE_USER('${id}')`,(error,rows)=>{
+          if (rows) {
+            return res.status(200).json( { message: "GET_PERMISIONS_USER",data:rows[0] } );
+          }else{
+            return res.status(400).json( { message: "ERROR_GET_PERMISIONS_USER" } );
+          }
+        })
+      }
+
+    } catch (error) {
+      res.send("error")
+      console.log(error);
+      
+      return error
+    }
+
+
+    
+  }
+  public async updateAdmin(
+    req: Request | any,
+    res: Response,
+    next: Partial<NextFunction>
+  ):Promise< Request|Response |any>{
+    try {
+      const verifyToken: Array<any> | any = jwt.verify( req.params.idToken, SECRET )!;
+      const { id } = verifyToken;
+      if(id){
+        const conn = await conexion.connect();
+        conn.query(`CALL ADMIN_UPDATE_DATA('${id}','${req.body.name}','${req.body.lastname}','${req.body.email}')`,(error,rows)=>{
+          if (rows) {
+            return res.status(200).json( { message: "UPDATE_ADMIN_USER" } );
+          }else{
+            return res.status(400).json( { message: "ERROR_UPDATE_ADMIN_USER" } );
+          }
+        })
+      }
+
+    } catch (error) {
+      res.send("error")
+      console.log(error);
+      
+      return error
+    }
+  }
+  public async deleteModule(
+    req: Request | any,
+    res: Response,
+    next: Partial<NextFunction>
+  ):Promise< Request|Response |any>{
+    try {
+      const verifyToken: Array<any> | any = jwt.verify( req.params.idToken, SECRET )!;
+      const { id } = verifyToken;
+      if(id){
+        const conn = await conexion.connect();
+        conn.query(`CALL DELETE_MODULE_USER('${id}','${req.body.idModule}')`,(error,rows)=>{
+          if (rows) {
+            return res.status(200).json( { message: "DELETE_MODULE_USER" } );
+          }else{
+            return res.status(400).json( { message: "ERROR_DELETE_MODULE_USER" } );
+          }
+        })
+      }
+
+    } catch (error) {
+      res.send("error")
+      console.log(error);
+      
+      return error
+    }
+  }
+  public async setModule(
+    req: Request | any,
+    res: Response,
+    next: Partial<NextFunction>
+  ):Promise< Request|Response |any>{
+    try {
+      const verifyToken: Array<any> | any = jwt.verify( req.params.idToken, SECRET )!;
+      const { id } = verifyToken;
+      if(id){
+        const conn = await conexion.connect();
+        conn.query(`CALL INSERT_MODULE_USER('${id}','${req.body.idModule}')`,(error,rows)=>{
+          if (rows) {
+            return res.status(200).json( { message: "SET_MODULE_USER" } );
+          }else{
+            return res.status(400).json( { message: "ERROR_SET_MODULE_USER" } );
+          }
+        })
+      }
+
+    } catch (error) {
+      res.send("error")
+      console.log(error);
+      
+      return error
+    }
+  }
+  public async setPermisionModule(
+    req: Request | any,
+    res: Response,
+    next: Partial<NextFunction>
+  ):Promise< Request|Response |any>{
+    try {
+      const verifyToken: Array<any> | any = jwt.verify( req.params.idToken, SECRET )!;
+      const { id } = verifyToken;
+      if(id){
+        const conn = await conexion.connect();
+        conn.query(`CALL ASIGNED_PERMISION_USER_ACCOUNT('${id}','${req.body.idModule}','${req.body.permisions}')`,(error,rows)=>{
+          if (rows) {
+            return res.status(200).json( { message: "SET_PERMISIONS_MODULE_USER" } );
+          }else{
+            return res.status(400).json( { message: "ERROR_SET_PERMISIONS_MODULE_USER" } );
+          }
+        })
+      }
+
+    } catch (error) {
+      res.send("error")
+      console.log(error);
+      
+      return error
+    }
+  }
+  public async deletePermisionModule(
+    req: Request | any,
+    res: Response,
+    next: Partial<NextFunction>
+  ):Promise< Request|Response |any>{
+    try {
+      const verifyToken: Array<any> | any = jwt.verify( req.params.idToken, SECRET )!;
+      const { id } = verifyToken;
+      if(id){
+        const conn = await conexion.connect();
+        conn.query(`CALL DELETE_PERMISIONS_MODULE_USER('${id}','${req.body.idModule}')`,(error,rows)=>{
+          if (rows) {
+            return res.status(200).json( { message: "DELETE_PERMISIONS_MODULE_USER" } );
+          }else{
+            return res.status(400).json( { message: "ERROR_DELETE_PERMISIONS_MODULE_USER" } );
+          }
+        })
+      }
+
+    } catch (error) {
+      res.send("error")
+      console.log(error);
+      
+      return error
+    }
+  }
+ 
+
+  }
+
 export default LoginRegister;
