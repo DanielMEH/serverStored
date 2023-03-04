@@ -77,11 +77,11 @@ class  RouterUser extends LoginRegister
      }
 
      public DeleteModuleUser(){
-      return router.post("/deleteModuleUser/:idmodule",this.deleteModule)
+      return router.post("/deleteModuleUser",this.deleteModule)
      }
      
      public SetModuleUsers(){
-      return router.post("/setModule/:idUsers",this.setModule)
+      return router.post("/setModule",this.setModule)
      }
 
      public SetPermisionModule(){

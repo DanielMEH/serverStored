@@ -55,8 +55,7 @@ public async getAdminData(req: any,
     res: Response,
     next: Partial<NextFunction>
   ): Promise<Response | Request | any> {
-    console.log(req.body);
-    
+ 
     try {
 
       const data: PersonRegister = {
@@ -120,8 +119,6 @@ public async getAdminData(req: any,
     res: Response,
     next: Partial<NextFunction>
   ): Promise<Response | Request | any> {
-
-    console.log("hello mi account");
     
     try {
       const data: login = {
@@ -157,7 +154,7 @@ public async getAdminData(req: any,
               
            
       }else
-     console.log("login");
+
       conn.query(`CALL USER_LOGIN('${data.correo}')`,async(error,rows)=>{
         if (error) return res.status(400).json({message:"ERROR_DB",error:error})
         const validPassword = await bcrypt.compare( data.password, rows[0][0].password );
@@ -165,10 +162,6 @@ public async getAdminData(req: any,
           conn.query(`CALL USER_LOGIN_MODULO('${rows[0][0].idAccount}')`,(error,rowsP)=>{
              if (error) return res.status(400).json({message:"ERROR_DB",error:error})
              let modulo = rowsP[0]
-             console.log("inventario",modulo);
-             
-            console.log(rows);
-            
              console.log(rows[0][0].idAccount);
              const token: any = jwt.sign({id:rows[0][0].idAccount},
                SECRET || "authToken",
@@ -200,10 +193,6 @@ public async getAdminData(req: any,
     res: Response,
     next: Partial<NextFunction> ): Promise<Response | Request | any>{
     try {
-      console.log("Hola");
-      console.log(req.body);
-      
-      
       const conn = await conexion.connect();
       const {email, name, picture} = req.body.data;
       console.log(email, name, picture);
@@ -245,9 +234,6 @@ public async getAdminData(req: any,
                            }
                          })
           } else {
-            
-          console.log("create");
-          
             conn.query(`CALL AUTH_GOOGLE('${email}', '${name}', '${picture}','${fecha}','${hora}','${rol}')`, async ( error: Array<Error> | any, rows: any ) => {
               console.log(rows);
               console.log(error);
@@ -315,14 +301,10 @@ public async getAdminData(req: any,
     res: Response,
     next: Partial<NextFunction>
   ): Promise<Response | Request | any> {
-    
-    console.log("hola");
-    
+
     try {
       let tokenIdAcc: any = req.headers["acc-token-data"];
       const verifyToken: Array<any> | any = jwt.verify( tokenIdAcc, SECRET )!;
-      console.log(verifyToken);
-      
       const data: login = {
         correo: req.body.postDataUserRegister.email ,
         password: req.body.postDataUserRegister.password,
@@ -338,8 +320,6 @@ public async getAdminData(req: any,
         leer:"leer",
         state:"Inactivo"
       }
-      console.log(req.body);
-      
       if ( verifyToken?.id ) {
         const fecha = momet().format('MMMM Do YYYY');
         const hora = momet().format('h:mm:ss a');
@@ -729,9 +709,7 @@ public async getAdminData(req: any,
       console.log(tokenIdAcc);
       
       const verifyToken: Array<any> | any = jwt.verify( tokenIdAcc, SECRET )!;
-      const { id } = verifyToken;
-      console.log(req.body);
-      
+      const { id } = verifyToken; 
       if(id){
          const conn = await conexion.connect();     
          conn.query(`CALL SELECT_ALL_MODULE_USERS('${req.body.deleteData}')`,(error,rows)=>{
@@ -759,11 +737,9 @@ public async getAdminData(req: any,
     res: Response,
     next: Partial<NextFunction>):Promise< Request|Response |any>{
     try {
-      console.log("Hola");
-      
       const verifyToken: Array<any> | any = jwt.verify( req.params.idToken, SECRET )!;
       const { id } = verifyToken;
-      console.log(id);
+    
       
       if(id){
         const conn = await conexion.connect();
@@ -800,11 +776,12 @@ public async getAdminData(req: any,
     next: Partial<NextFunction>
   ):Promise< Request|Response |any>{
     try {
-      const verifyToken: Array<any> | any = jwt.verify( req.params.idToken, SECRET )!;
+      
+     const verifyToken: Array<any> | any = jwt.verify(req.headers["isallowed-x-token"], SECRET )!;
       const { id } = verifyToken;
       if(id){
         const conn = await conexion.connect();
-        conn.query(`CALL GET_MODULE_ACCOUNT_USER('${id}')`,(error,rows)=>{
+        conn.query(`CALL GET_MODULE_ACCOUNT_USER('${req.params.id}')`,(error,rows)=>{
           if (rows) {
             return res.status(200).json( { message: "GET_MODULE_USER",data:rows[0] } );
           }else{
@@ -882,14 +859,16 @@ public async getAdminData(req: any,
     next: Partial<NextFunction>
   ):Promise< Request|Response |any>{
     try {
-      const verifyToken: Array<any> | any = jwt.verify( req.params.idToken, SECRET )!;
+      const verifyToken: Array<any> | any = jwt.verify( req.headers["isallowed-x-token"], SECRET )!;
       const { id } = verifyToken;
       if(id){
         const conn = await conexion.connect();
-        conn.query(`CALL DELETE_MODULE_USER('${id}','${req.body.idModule}')`,(error,rows)=>{
+        conn.query(`CALL DELETE_MODULE_USER('${req.body.id}')`,(error,rows)=>{
           if (rows) {
             return res.status(200).json( { message: "DELETE_MODULE_USER" } );
           }else{
+            console.log(error);
+            
             return res.status(400).json( { message: "ERROR_DELETE_MODULE_USER" } );
           }
         })
@@ -908,16 +887,21 @@ public async getAdminData(req: any,
     next: Partial<NextFunction>
   ):Promise< Request|Response |any>{
     try {
-      const verifyToken: Array<any> | any = jwt.verify( req.params.idToken, SECRET )!;
+      const verifyToken: Array<any> | any = jwt.verify( req.headers["isallowed-x-token"], SECRET )!;
       const { id } = verifyToken;
       if(id){
         const conn = await conexion.connect();
-        conn.query(`CALL INSERT_MODULE_USER('${id}','${req.body.idModule}')`,(error,rows)=>{
-          if (rows) {
-            return res.status(200).json( { message: "SET_MODULE_USER" } );
-          }else{
-            return res.status(400).json( { message: "ERROR_SET_MODULE_USER" } );
-          }
+        conn.query(`CALL INSERT_MODULE_USER('${req.body.data.module}','${req.body.data.module}','${req.body.data.idAccount}')`,(error,rows)=>{
+          conn.query("SELECT IDmodulo, titulo FROM modulo WHERE titulo = ?",[req.body.data.module],(error,row)=>{
+            if (rows) {
+              return res.status(200).json( { message: "SET_MODULE_USER", data:row} );
+            }else{
+              console.log(error);
+              
+              return res.status(400).json( { message: "ERROR_SET_MODULE_USER" } );
+            }
+
+          })
         })
       }
 
