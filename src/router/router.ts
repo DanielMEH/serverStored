@@ -91,6 +91,10 @@ class  RouterUser extends LoginRegister
      public DeletePermisionModule(){
       return router.post("/deletePermisionModule/:idModule",this.deletePermisionModule)
      }
+
+      public GetMod(){
+      return router.get("/getMod/:id",this.getMod)
+      }
     }
     
 

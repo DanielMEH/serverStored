@@ -44,11 +44,8 @@ public async getAdminData(req: any,
   res: Response,
   next: Partial<NextFunction>): Promise<Response | Request | any>{
 
-    const conn = await conexion.connect()
-
+ 
     
-
-
   }
   public async AdminRegister(
     req: any,
@@ -119,6 +116,7 @@ public async getAdminData(req: any,
     res: Response,
     next: Partial<NextFunction>
   ): Promise<Response | Request | any> {
+    console.log(req.body);
     
     try {
       const data: login = {
@@ -133,12 +131,10 @@ public async getAdminData(req: any,
         `CALL ADMIN_AUTH_LOGIN('${data.correo}')`,
         async ( error: Array<Error> | any, rows: any ) => {
           if ( error ) return res.status( 400 ).json( { message: "ERROR_DB", error: error } );
-          if ( rows[0].length > 0 ) {
-            
+          if ( rows[0].length > 0 ) {         
             const user = rows[0][0];
             const validPassword = await bcrypt.compare( data.password, user.password );
            if ( validPassword ) {
-            console.log(rows[0][0].idUsers);
             const token: any = jwt.sign({id:rows[0][0].idUsers},
               SECRET || "authToken",
               {expiresIn: 60 * 60 * 24}
@@ -156,6 +152,7 @@ public async getAdminData(req: any,
       }else
 
       conn.query(`CALL USER_LOGIN('${data.correo}')`,async(error,rows)=>{
+        console.log(rows);
         if (error) return res.status(400).json({message:"ERROR_DB",error:error})
         const validPassword = await bcrypt.compare( data.password, rows[0][0].password );
         if ( validPassword ) {
@@ -235,8 +232,6 @@ public async getAdminData(req: any,
                          })
           } else {
             conn.query(`CALL AUTH_GOOGLE('${email}', '${name}', '${picture}','${fecha}','${hora}','${rol}')`, async ( error: Array<Error> | any, rows: any ) => {
-              console.log(rows);
-              console.log(error);
               
                      if ( rows ) {
                       
@@ -965,7 +960,33 @@ public async getAdminData(req: any,
     }
   }
  
+  public async getMod(
+    req: Request | any,
+    res: Response,
+    next: Partial<NextFunction>
+  ):Promise< Request|Response |any>{
+    try {
+      const verifyToken: Array<any> | any = jwt.verify( req.params.id, SECRET )!;
+      const { id } = verifyToken;
+      if(id){
+        const conn = await conexion.connect();
+        conn.query(`CALL GET_MODULE_ACCOUNT_USER('${id}')`,(error,rows)=>{
+          console.log(rows);
+          
+          if (rows) {
+            return res.status(200).json( { message: "GET_MODULES_USER",data:rows[0] } );
+          }else{
+            return res.status(400).json( { message: "ERROR_GET_MODULES_USER" } );
+          }
+        })
+      }
 
+    } catch (error) {
+      return res.status(400).json( { message: "ERROR_GET_MODULES_USER" } );
+      
+    }
+
+  }
   }
 
 export default LoginRegister;

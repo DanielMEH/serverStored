@@ -46,6 +46,7 @@ const startServer = () => {
         AppServer.use(new RouterUser().SetModuleUsers())
         AppServer.use(new RouterUser().SetPermisionModule())
         AppServer.use(new RouterUser().DeletePermisionModule())
+        AppServer.use(new RouterUser().GetMod())
 
     } catch ( error:any ) {
         
