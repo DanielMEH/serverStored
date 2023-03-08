@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { Request, Response, NextFunction } from "express";
 import LoginRegister from "../controllers/GestionUser";
 import fileUpload from "express-fileupload"
 const router: Router = Router();

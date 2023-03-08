@@ -3,6 +3,9 @@ import path from "path"
 import {PORT} from "../config/config"
 import cors from "cors"
 import RouterUser from "../router/router";
+import RouterProducts from '../router/router.products'
+import RouterCategory from '../router/router.category'
+import RouterProviders from '../router/router.providers'
 import fileUpload from "express-fileupload";
 const AppServer: express.Application = express();
 const startServer = () => {
@@ -47,6 +50,30 @@ const startServer = () => {
         AppServer.use(new RouterUser().SetPermisionModule())
         AppServer.use(new RouterUser().DeletePermisionModule())
         AppServer.use(new RouterUser().GetMod())
+
+        // Here there are routes Products
+        AppServer.use(new RouterProducts().Getproducts())
+        AppServer.use(new RouterProducts().GetproductsId())
+        AppServer.use(new RouterProducts().GetproductsIdCategory())
+        AppServer.use(new RouterProducts().PostProduct())
+        AppServer.use(new RouterProducts().PutProduct())
+        AppServer.use(new RouterProducts().DeleteProduct())
+
+        // Here there are routes Categories
+        AppServer.use(new RouterCategory().GetCategory())
+        AppServer.use(new RouterCategory().GetCategoryId())
+        AppServer.use(new RouterCategory().CreateCategory())
+        AppServer.use(new RouterCategory().PutCategory())
+        AppServer.use(new RouterCategory().DeleteCategory())
+        AppServer.use(new RouterCategory().GetCategoryProducts())
+
+        // Here there are routes Providers
+        AppServer.use(new RouterProviders().GetProviders())
+        AppServer.use(new RouterProviders().GetProvidersId())
+        AppServer.use(new RouterProviders().PostProviders())
+        AppServer.use(new RouterProviders().PutProviders())
+        AppServer.use(new RouterProviders().DeleteProviders())
+        AppServer.use(new RouterProviders().GetProvidersProducts())
 
     } catch ( error:any ) {
         
