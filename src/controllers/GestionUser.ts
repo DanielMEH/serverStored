@@ -42,10 +42,7 @@ abstract class LoginRegister {
 
 public async getAdminData(req: any,
   res: Response,
-  next: Partial<NextFunction>): Promise<Response | Request | any>{
-
- 
-    
+  next: Partial<NextFunction>): Promise<Response | Request | any>{ 
   }
   public async AdminRegister(
     req: any,
