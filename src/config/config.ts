@@ -17,4 +17,6 @@ export const MAIL_USER = process.env["MAIL_USER"]
 
 
 // ? MONGO
-export const MONGO_URI = process.env["MONGO_URI"]
+export const MONGO_URI_ATLAS = process.env["MONGO_URI_ATLAS"]
+export const MONGO_URI_LOCAL=process.env["MONGO_URI_LOCAL"]
+

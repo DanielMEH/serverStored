@@ -1,4 +1,5 @@
 import express from "express";
+import mongoose from "mongoose";
 import path from "path"
 import {PORT} from "../config/config"
 import cors from "cors"
@@ -7,6 +8,7 @@ import RouterProducts from '../router/router.products'
 import RouterCategory from '../router/router.category'
 import RouterProviders from '../router/router.providers'
 import {connect} from '../database/mongodb'
+mongoose.set('strictQuery', true);
 const AppServer: express.Application = express();
 const startServer = () => {
     try {
@@ -21,8 +23,7 @@ const startServer = () => {
         AppServer.use( express.static( path.join( __dirname, "public" ) ) );
         AppServer.use( express.json() );
         AppServer.use( express.urlencoded( { extended: true } ) )
-       
-    
+
         AppServer.listen( PORT || port, () => {
         
             console.log( "connection in the port: :", PORT );
@@ -75,10 +76,11 @@ const startServer = () => {
         AppServer.use(new RouterProviders().DeleteProviders())
         AppServer.use(new RouterProviders().GetProvidersProducts())
 
-
+        // Here connect MongoDB
         const con =  connect()
         console.log(con)
 
+        
     } catch ( error:any ) {
         
         throw new Error( error );
