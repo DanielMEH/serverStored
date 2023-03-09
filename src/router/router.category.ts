@@ -1,7 +1,8 @@
 import {Router} from 'express'
 const router:Router = Router()
+import Categorys from '../controllers/GestionCategory'
 
-class RouterCategory{
+class RouterCategory extends Categorys{
 
     public CreateCategory(){
         router.post('/category',this.createCategory)

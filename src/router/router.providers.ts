@@ -1,7 +1,8 @@
 import {Router} from 'express';
 const router:Router = Router()
+import ManageProviders from '../controllers/GestionProviders'
 
-class RouterProviders{
+class RouterProviders extends ManageProviders{
     public GetProviders(){
         router.get('/providers',this.getProviders)
         return router;

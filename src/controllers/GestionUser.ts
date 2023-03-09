@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import { Request, Response, NextFunction, response } from "express";
+import { Request, Response, NextFunction} from "express";
 import {
   login,
   PersonRegister,
@@ -14,8 +14,6 @@ import jwt from "jsonwebtoken";
 import { SECRET } from "../config/config"; // <--- this is the problem
 import { sendMailAdmin } from "../libs/libs";
 import { recoveryAdminPass } from "../libs/forGotPassword";
-import { authUser } from "../auth/authUser";
-import { recoveryUserPass } from "../libs/forgotPassUser";
 import moment from 'moment-with-locales-es6';
 // import { newPasswordUser } from "../interfaces/users";
 let momet:any = moment

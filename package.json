@@ -53,6 +53,7 @@
     "fileupload": "^1.0.0",
     "moment-es6": "^1.0.0",
     "moment-with-locales-es6": "^1.0.1",
+    "mongodb": "^5.1.0",
     "mysql2": "^2.3.3",
     "ngx-custom-tooltip": "^1.0.1",
     "tedious": "^15.1.0"

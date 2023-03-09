@@ -1,4 +1,4 @@
-import express,{Request, Response} from "express";
+import express from "express";
 import path from "path"
 import {PORT} from "../config/config"
 import cors from "cors"
@@ -6,7 +6,7 @@ import RouterUser from "../router/router";
 import RouterProducts from '../router/router.products'
 import RouterCategory from '../router/router.category'
 import RouterProviders from '../router/router.providers'
-import fileUpload from "express-fileupload";
+import {connect} from '../database/mongodb'
 const AppServer: express.Application = express();
 const startServer = () => {
     try {
@@ -74,6 +74,10 @@ const startServer = () => {
         AppServer.use(new RouterProviders().PutProviders())
         AppServer.use(new RouterProviders().DeleteProviders())
         AppServer.use(new RouterProviders().GetProvidersProducts())
+
+
+        const con =  connect()
+        console.log(con)
 
     } catch ( error:any ) {
         
