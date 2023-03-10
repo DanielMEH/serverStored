@@ -2,7 +2,6 @@ import { Product } from './../interfaces/product';
 import { Request, Response } from 'express';
 import ProductSchema from '../models/modelProduct'
 
-
 abstract class ManageProducts{
 
     public async postProducts(
@@ -45,15 +44,35 @@ abstract class ManageProducts{
 
     }
 
-    public async getProducts(){}
+    public async getProducts(res:Response,req:Request):Promise<void>{
+        const products:Product[] = await ProductSchema.find();
+       //res.send(products);
+       console.log(products);
+       res.render("Productssssss",
+    products[0])
+       
+    }
+    public async getProductsId(res:Response, req: Request):Promise<void>{
+        const product = await ProductSchema.findById(req.params.id);
+        console.log(product);
+        
+        res.send(product);
+    }
 
-    public async getProductsId(){}
+    public async getProductsIdCategory(res:Response,req: Request):Promise<void>{
+        const product = await ProductSchema.findById(req.params.id);
+        res.send(product) ;
+    }
 
-    public async getProductsIdCategory(){}
+    public async putProducts(res:Response, req:Request):Promise<void>{
+        const product = await ProductSchema.findByIdAndUpdate(req.params.id)
+        res.send( product);
+    }
 
-    public async putProducts(){}
-
-    public async deleteProducts(){}
+    public async deleteProducts(res:Response, req:Request){
+        const product = await ProductSchema.findByIdAndDelete(req.params.id);
+        return product;
+    }
 }
 
 

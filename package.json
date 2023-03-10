@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.ts",
+  "module": "es6",
+
   "scripts": {
     "build": "tsc",
     "dev": "ts-node-dev --respawn src/server/index.ts"

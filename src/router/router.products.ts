@@ -6,32 +6,31 @@ import ManageProducts from '../controllers/GestionProductos'
 class RouterProducts extends ManageProducts{
    
     public Getproducts(){
-    router.get('/products',this.getProducts );
+    router.get('/getProducts',this.getProducts );
       return router;    
    }
 
     public GetproductsId(){
-    router.get('/products/:id',this.getProductsId);
+    router.get('/getProducts/:id',this.getProductsId);
       return router;
     }
-
     public GetproductsIdCategory(){
-    router.get('/products/category/:id',this.getProductsIdCategory);
+    router.get('/productsCategory/:id',this.getProductsIdCategory);
       return router;
     }
 
     public PostProduct(){
-    router.post('/products',this.postProducts);
+    router.post('/createProducts',this.postProducts);
       return router;
     }
 
     public PutProduct(){
-    router.put('/products/:id',this.putProducts);
+    router.put('updatProducts/:id',this.putProducts);
       return router;
     }
 
     public DeleteProduct(){
-    router.delete('/products/:id',this.deleteProducts);
+    router.delete('/deleteProducts/:id',this.deleteProducts);
       return router;
     }
 }
