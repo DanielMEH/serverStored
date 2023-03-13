@@ -2,7 +2,6 @@ import mongoose from 'mongoose';
 
 
 export interface Product extends mongoose.Document{
-    codProduct :number;
     iva: number;
     name: string;
     category: string;

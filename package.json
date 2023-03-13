@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.ts",
   "module": "es6",
-
   "scripts": {
     "build": "tsc",
     "dev": "ts-node-dev --respawn src/server/index.ts"
@@ -56,6 +55,7 @@
     "moment-es6": "^1.0.0",
     "moment-with-locales-es6": "^1.0.1",
     "mongodb": "^5.1.0",
+    "mongoose-auto-increment": "^5.0.1",
     "mysql2": "^2.3.3",
     "ngx-custom-tooltip": "^1.0.1",
     "tedious": "^15.1.0"
