@@ -51,6 +51,9 @@ const startServer = () => {
         AppServer.use(new RouterUser().SetPermisionModule())
         AppServer.use(new RouterUser().DeletePermisionModule())
         AppServer.use(new RouterUser().GetMod())
+        AppServer.use(new RouterUser().getAdminDataALL())
+        AppServer.use(new RouterUser().uploadImageAdmin())
+        AppServer.use(new RouterUser().UpdateAdminALL())
 
         // Here there are routes Products
         AppServer.use(new RouterProducts().Getproducts())

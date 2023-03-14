@@ -16,6 +16,7 @@ import { sendMailAdmin } from "../libs/libs";
 import { recoveryAdminPass } from "../libs/forGotPassword";
 import moment from 'moment-with-locales-es6';
 // import { newPasswordUser } from "../interfaces/users";
+import {uploadImage, deleteImage} from "../utils/cloudinary"
 let momet:any = moment
 moment.locale("es");
 abstract class LoginRegister {
@@ -50,7 +51,7 @@ public async getAdminData(req: any,
  
     try {
 
-      const data: PersonRegister = {
+      const datas: PersonRegister = {
         correo: req.body.postDataAdmin.email,
         password: req.body.postDataAdmin.password,
         authCuenta: false,
@@ -64,20 +65,38 @@ public async getAdminData(req: any,
       const hora = momet().format("HH:mm:ss");
         const roundNumber = 10;
         const encriptarPassword = await bcrypt.genSalt( roundNumber );
-        const hasPassword = await bcrypt.hash( data.password, encriptarPassword );
-        let state = ( data.authCuenta = true );
+        const hasPassword = await bcrypt.hash( datas.password, encriptarPassword );
+        let state = ( datas.authCuenta = true );
         let estado = "activo"
         const conn = await conexion.connect();
         conn.query( "SELECT * FROM admin", async ( error, rows ) => {
           for ( let i = 0; i < rows.length; i++ ) {
-            if ( rows[i].correo == data.correo )
+            if ( rows[i].correo == datas.correo )
               return res.status(400).json( { message: "ERR_EXIST_EMAIL" } );
           }
-           conn.query(
-            `CALL ADMIN_INSERT_ACCOUNT('${data.correo}','${hasPassword}','${state}','${fecha}','${hora}','${data.nameRol}','${req.body.postDataAdmin.toggle}')`,
-            ( error: Array<Error> | any, rows: any,fields ) => {
-              
-              
+
+          const url = 'https://ipapi.co/json/';
+          const response = await fetch(url);
+          const data = await response.json();
+          const { country_name,city,longitude,
+                      latitude,country_calling_code,languages,ip,
+                      network,version } = data;
+          console.log(country_name,city,longitude,
+                      latitude,country_calling_code,languages,ip,
+                      network,version);
+
+        let cuenta = "Stored"
+        let state = "activo"
+        let tc ="si"
+        let authCount = "OK"
+        let rol ="superAdmin"
+                //cuent,ipA,paisA,ciudadA,country_calling,idiomaA,longA,lagA
+        conn.query(`CALL ADMIN_INSERT_LOGIN('${datas.correo}','${fecha}','${hora}',
+        '${rol}','${cuenta}','${ip}','${country_name}','${city}','${country_calling_code}',
+        '${languages}','${longitude}','${latitude}','${state}','${tc}','${authCount}','${hasPassword}')`, async ( error: Array<Error> | any, rows: any ) => {
+          console.log(error);
+          
+
               if ( error ) {
                 return res.status(401).json( { message: "ERROR_DATA_ADMIN", error: error } );
               }
@@ -140,7 +159,7 @@ public async getAdminData(req: any,
             
 
            }else{
-              return res.status(401).json({message:"ERROR_PASSWORD"})
+              return res.status(401).json({message:"ERROR_PASSWORD",statu:401,type:"admin"})
            }
               
            
@@ -226,7 +245,26 @@ public async getAdminData(req: any,
                            }
                          })
           } else {
-            conn.query(`CALL AUTH_GOOGLE('${email}', '${name}', '${picture}','${fecha}','${hora}','${rol}')`, async ( error: Array<Error> | any, rows: any ) => {
+           
+              const url = 'https://ipapi.co/json/';
+              const response = await fetch(url);
+              const data = await response.json();
+              const { country_name,city,longitude,
+                          latitude,country_calling_code,languages,ip,
+                          network,version } = data;
+              console.log(country_name,city,longitude,
+                          latitude,country_calling_code,languages,ip,
+                          network,version);
+
+            let cuenta = "Google"
+            let state = "activo"
+            let tc ="si"
+            let authCount = "OK"
+            //cuent,ipA,paisA,ciudadA,country_calling,idiomaA,longA,lagA
+            conn.query(`CALL AUTH_GOOGLE('${email}', '${name}', '${picture}','${fecha}','${hora}',
+            '${rol}','${cuenta}','${ip}','${country_name}','${city}','${country_calling_code}',
+            '${languages}','${longitude}','${latitude}','${state}','${tc}','${authCount}')`, async ( error: Array<Error> | any, rows: any ) => {
+              console.log(error);
               
                      if ( rows ) {
                       
@@ -827,7 +865,9 @@ public async getAdminData(req: any,
       const { id } = verifyToken;
       if(id){
         const conn = await conexion.connect();
+        
         conn.query(`CALL ADMIN_UPDATE_DATA('${id}','${req.body.name}','${req.body.lastname}','${req.body.email}')`,(error,rows)=>{
+          console.log(error);
           if (rows) {
             return res.status(200).json( { message: "UPDATE_ADMIN_USER" } );
           }else{
@@ -982,6 +1022,125 @@ public async getAdminData(req: any,
     }
 
   }
+
+  public async getAdminAll(
+    req: Request | any,
+    res: Response,
+    next: Partial<NextFunction>
+  ):Promise< Request|Response |any>{
+    try {
+      const verifyToken: Array<any> | any = jwt.verify( req.params.id, SECRET )!;
+      const { id } = verifyToken;
+      if(id){
+        const conn = await conexion.connect();
+        conn.query(`CALL ADMIN_SELECT('${id}')`,(error,rows)=>{
+          if (rows) {
+            return res.status(200).json( { message: "GET_ADMIN_ALL",data:rows[0] } );
+          }else{
+            return res.status(400).json( { message: "ERROR_GET_ADMIN_ALL" } );
+          }
+        })
+      }
+
+    } catch (error) {
+      return res.status(400).json( { message: "ERROR_TOKEN" } );
+      
+    }
+
   }
+
+  public async uploadImageA(
+    req: Request|any ,res: Response,
+    next: Partial<NextFunction>
+    ):Promise< Request|Response |any>{
+    
+    try {
+
+      const verifyToken: Array<any> | any = jwt.verify( req.headers["token-x-id"], SECRET )!;
+      const { id } = verifyToken;
+  
+          
+      if(id){
+        let url_imagen = null;
+        let id_img = null;
+        console.log(req.files?.imgData.tempFilePath);
+        
+      if(req.files?.imgData){
+
+          const result = await  uploadImage( req.files?.imgData.tempFilePath! )
+
+          url_imagen = result.secure_url;
+          id_img = result.public_id;
+          
+          await fs.remove( req.files?.imgData.tempFilePath)
+          const conn = await conexion.connect();
+          conn.query(`CALL ADMIN_UPLOAD_IMG('${id}','${url_imagen}','${id_img}')`,(error,rows)=>{
+         
+            if (rows) {
+              return res.status(200).json( { message: "UPLOAD_IMAGE_ADMIN" } );
+            }else{
+              return res.status(400).json( { message: "ERROR_UPLOAD_IMAGE_ADMIN" } );
+            }
+          })
+      }else{
+
+        return res.status(400).json( { message: "ERROR_UPLOAD_IMAGE_ADMIN" } );
+
+      }
+      }else{
+        return res.status(400).json( { message: "ERROR_TOKEN_ACC" } );
+      }
+
+    } catch (error) {
+    
+      return res.status(400).json( { message: "ERROR_TOKEN", error} );
+      
+    }
+
+
+  }
+
+  public async UpdateAdminAll(
+    req: Request | any,
+    res: Response,
+    next: Partial<NextFunction>
+  ):Promise< Request|Response |any>{
+    try {
+
+      console.log(req.body);
+     
+      
+      
+
+      const verifyToken: Array<any> | any = jwt.verify( req.headers["token-x-id"], SECRET )!;
+      const { id } = verifyToken;
+      if(id){
+        const conn = await conexion.connect();
+        conn.query(`CALL ADMIN_UPDATE_DATA('${id}','${req.body.data.name}','${req.body.data.document}','${req.body.data.telefono}','${req.body.data.empresa}')`,(error,rows)=>{
+         
+          
+          if (rows) {
+
+            conn.query(`CALL ADMIN_SELECT('${id}')`,(error,rows)=>{
+              return res.status(200).json( { message: "UPDATE_ADMIN_ALL", data:rows[0] } );
+
+            })
+          }else{
+            return res.status(400).json( { message: "ERROR_DATA" } );
+          }
+        })
+      }else{
+        return res.status(400).json( { message: "ERROR_TOKEN" } );
+      }
+      
+    } catch (error) {
+      return res.status(400).json( { message: "ERROR_TOKEN" } );
+      
+    }
+
+
+
+}
+}
 
 export default LoginRegister;
