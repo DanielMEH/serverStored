@@ -14,3 +14,7 @@ export const PORTDB = process.env["PORTDB"]
 export const LIMIT_CONNECION = process.env["CONNECTION_LIMIT"]
 export const MAIL_PASSWORD = process.env["MAIL_PASSWORD"];
 export const MAIL_USER = process.env["MAIL_USER"]
+// coudinary
+export const cludinaryKey = process.env['cloudinaryKey']
+export const claudinarySecret = process.env['cloudinarySecret']
+export const claudinar_Name = process.env['claudinar_Name']

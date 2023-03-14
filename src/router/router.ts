@@ -95,6 +95,19 @@ class  RouterUser extends LoginRegister
       public GetMod(){
       return router.get("/getMod/:id",this.getMod)
       }
+
+      public getAdminDataALL(){
+        return router.get("/getAdminAll/:id",this.getAdminAll)
+      }
+      public UpdateAdminALL(){
+        return router.put("/updateAdminALL",this.UpdateAdminAll)
+      }
+      public uploadImageAdmin(){
+        return router.put("/AuploadImageA",fileUpload({
+          useTempFiles:true,
+          tempFileDir : "./uploads"
+        }),this.uploadImageA)
+      }
     }
     
 
