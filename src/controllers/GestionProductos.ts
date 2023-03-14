@@ -28,13 +28,15 @@ abstract class ManageProducts {
       description,
       caducidad,  
     });
-    await product.save();
+  const produ =  await product.save();
+  console.log(produ);
+
+
     res.send("Product creado");
   }
 
   public async getProducts( req: Request, res: Response): Promise<void> {
     const products: Product[] = await ProductSchema.find();
-    //res.send(products);
     console.log(products);
     res.send(products)
   }
