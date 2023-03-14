@@ -13,10 +13,10 @@ const ProductSchema = new Schema({
   description: String,
   caducidad: Date,
   tokeIdUser: { type: String, require: true, unique: true },
-  timestamps: {
-    createdAt: "created_at",
-    
-  }
+  
+},
+{
+  timestamps:true
 });
 
 export default model<Product>("Product", ProductSchema);

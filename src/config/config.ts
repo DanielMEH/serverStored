@@ -14,16 +14,12 @@ export const PORTDB = process.env["PORTDB"]
 export const LIMIT_CONNECION = process.env["CONNECTION_LIMIT"]
 export const MAIL_PASSWORD = process.env["MAIL_PASSWORD"];
 export const MAIL_USER = process.env["MAIL_USER"]
-<<<<<<< HEAD
-
-
-// ? MONGO
-export const MONGO_URI_ATLAS = process.env["MONGO_URI_ATLAS"]
-export const MONGO_URI_LOCAL=process.env["MONGO_URI_LOCAL"]
-
-=======
 // coudinary
 export const cludinaryKey = process.env['cloudinaryKey']
 export const claudinarySecret = process.env['cloudinarySecret']
 export const claudinar_Name = process.env['claudinar_Name']
->>>>>>> 413741accd73d57d15de0ebc2b195d892f213619
+
+//  mongoose key 
+// ? MONGO
+export const MONGO_URI_ATLAS = process.env["MONGO_URI_ATLAS"]
+export const MONGO_URI_LOCAL=process.env["MONGO_URI_LOCAL"]

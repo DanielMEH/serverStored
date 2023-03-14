@@ -1,12 +1,204 @@
+import { Request, Response, NextFunction } from "express";
+import CategorySchema from "../models/CategoryM";
+import { category } from "../interfaces/CategoryI";
+import jwt from "jsonwebtoken";
+import { SECRET } from "../config/config"; 
+abstract class Caterorys {
+  public async createCategory(
+    req: Request,
+    res: Response,
+    next: Partial<NextFunction>
+  ): Promise<Response | Request | any> {
+    try {
+      
+      const {name_category,description,imgURL,imgId} = req.body;    
+      const Tokenid_U:any = req.headers["x-id-token"]  
+      const verifyToken: Array<any> | any = jwt.verify( Tokenid_U, SECRET )!;
+
+      const tokeIdUser = verifyToken.id;
+      console.log(verifyToken);
+      console.log(tokeIdUser);
+      
+      
+
+      if(!tokeIdUser){
+        return res.status(400).json({
+          ok: false,
+          message: 'No existe el token'
+      })
+      }else{
+        const data: category = new CategorySchema({
+          tokeIdUser,
+          name_category,
+          description,
+          imgURL,
+          imgId
+        })
+        const dataCategory = await data.save();
+        console.log(dataCategory);
+        
+          return res.status(200).json({
+              ok: true,
+              message: 'Categoria creada',
+              data: dataCategory
+  
+  
+          })
+      }
+        
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            message: 'Error al crear la categoria',
+            error
+        })
+        
+    }
 
 
-abstract class Caterorys{
-    public async createCategory(){}
-    public async getCategory(){}
-    public async getCategoryId(){}
-    public async putCategory(){}
-    public async deleteCategory(){}
-    public async getCategoryProducts(){}
+  }
+
+  public async getCategory(
+    req: Request,
+    res: Response,
+    next: Partial<NextFunction>
+  ): Promise<Response | Request | any> {
+
+   try {
+    const Tokenid_U:any = req.headers["x-id-token"]  
+    const verifyToken: Array<any> | any = jwt.verify( Tokenid_U, SECRET )!;
+
+    const tokeIdUser = verifyToken.id;
+
+    if(!tokeIdUser){
+      return res.status(400).json({
+        ok: false,
+        message: 'No existe el token'
+    })
+    }
+
+    const dataCategory = await CategorySchema.find({tokeIdUser});
+    return res.status(200).json({
+      ok: true,
+      message: 'Categorias',  
+      data: dataCategory
+    })
+
+   } catch (error) {
+    return res.status(500).json({
+      ok: false,
+      message: 'Error al obtener las categorias',
+      error
+    })
+
+  }
+}
+  public async getCategoryId(
+    req: Request,
+    res: Response,
+    next: Partial<NextFunction>
+  ): Promise<Response | Request | any> {}
+
+  public async putCategory(
+    req: Request,
+    res: Response,
+    next: Partial<NextFunction>
+  ): Promise<Response | Request | any> {
+
+    try {
+      
+      const {name_category,description,imgURL,imgId} = req.body;    
+      const Tokenid_U:any = req.headers["x-id-token"]  
+      const verifyToken: Array<any> | any = jwt.verify( Tokenid_U, SECRET )!;
+
+      const tokeIdUser = verifyToken.id;
+      console.log(verifyToken);
+      console.log(tokeIdUser);
+      
+      
+
+      if(!tokeIdUser){
+        return res.status(400).json({
+          ok: false,
+          message: 'No existe el token'
+      })
+      }else{
+        const data: category = new CategorySchema({
+          tokeIdUser,
+          name_category,
+          description,
+          imgURL,
+          imgId
+        })
+        const dataCategory = await CategorySchema.findByIdAndUpdate(req.params._id,data,{
+          new:true
+        });
+        console.log(dataCategory);
+        
+          return res.status(200).json({
+              ok: true,
+              message: 'update_category',
+              data: dataCategory
+  
+  
+          })
+      }
+        
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            message: 'Error_category',
+            error
+        })
+        
+    }
+
+
+  }
+
+  public async deleteCategory(
+    req: Request,
+    res: Response,
+    next: Partial<NextFunction>
+  ): Promise<Response | Request | any> {
+    try {
+      const Tokenid_U:any = req.headers["x-id-token"]  
+      const verifyToken: Array<any> | any = jwt.verify( Tokenid_U, SECRET )!;
+  
+      const tokeIdUser = verifyToken.id;
+  
+      if(!tokeIdUser){
+        return res.status(400).json({
+          ok: false,
+          message: 'No existe el token'
+      })
+      }
+  
+      const dataCategory = await CategorySchema.findByIdAndDelete(req.params._id);
+      return res.status(200).json({
+        ok: true,
+        message: 'Delete category',  
+        data: dataCategory
+      })
+  
+     } catch (error) {
+      return res.status(500).json({
+        ok: false,
+        message: 'Error al eliminar  las categorias',
+        error
+      })
+  
+    }
+
+
+  }
+
+  
+  public async getCategoryProducts(
+    req: Request,
+    res: Response,
+    next: Partial<NextFunction>
+  ): Promise<Response | Request | any> {}
 }
 
 export default Caterorys;

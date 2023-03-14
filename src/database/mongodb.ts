@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+import mongoose from 'mongoose';
 import { MONGO_URI_LOCAL , MONGO_URI_ATLAS} from '../config/config';
 
 
