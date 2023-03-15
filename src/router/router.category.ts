@@ -15,7 +15,7 @@ class RouterCategory extends Categorys{
     }
 
     public GetCategoryId(){
-        router.get('/category/:id',this.getCategoryId)
+        router.get('/category/:_id',this.getCategoryId)
         return router;
 
     }

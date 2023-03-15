@@ -4,6 +4,8 @@ import { category } from "../interfaces/CategoryI";
 import jwt from "jsonwebtoken";
 import { SECRET } from "../config/config"; 
 abstract class Caterorys {
+
+
   public async createCategory(
     req: Request,
     res: Response,
@@ -63,6 +65,7 @@ abstract class Caterorys {
     res: Response,
     next: Partial<NextFunction>
   ): Promise<Response | Request | any> {
+console.log("hola");
 
    try {
     const Tokenid_U:any = req.headers["x-id-token"]  
@@ -97,7 +100,37 @@ abstract class Caterorys {
     req: Request,
     res: Response,
     next: Partial<NextFunction>
-  ): Promise<Response | Request | any> {}
+  ): Promise<Response | Request | any> {
+    try {
+      const Tokenid_U:any = req.headers["x-id-token"]  
+      const verifyToken: Array<any> | any = jwt.verify( Tokenid_U, SECRET )!;
+  
+      const tokeIdUser = verifyToken.id;
+  
+      if(!tokeIdUser){
+        return res.status(400).json({
+          ok: false,
+          message: 'No existe el token'
+      })
+      }
+  
+      const dataCategory = await CategorySchema.findById(req.params._id);
+      return res.status(200).json({
+        ok: true,
+        message: 'Categorias',  
+        data: dataCategory
+      })
+  
+     } catch (error) {
+      return res.status(500).json({
+        ok: false,
+        message: 'Error al obtener las categorias',
+        error
+      })
+  
+    }
+
+  }
 
   public async putCategory(
     req: Request,
@@ -105,6 +138,7 @@ abstract class Caterorys {
     next: Partial<NextFunction>
   ): Promise<Response | Request | any> {
 
+    console.log(req.params._id);
     try {
       
       const {name_category,description,imgURL,imgId} = req.body;    
@@ -123,22 +157,14 @@ abstract class Caterorys {
           message: 'No existe el token'
       })
       }else{
-        const data: category = new CategorySchema({
-          tokeIdUser,
-          name_category,
-          description,
-          imgURL,
-          imgId
-        })
-        const dataCategory = await CategorySchema.findByIdAndUpdate(req.params._id,data,{
-          new:true
+      
+        const ipdateCategory = await CategorySchema.findByIdAndUpdate(req.params._id,req.body,{
+          new: true
         });
-        console.log(dataCategory);
-        
           return res.status(200).json({
               ok: true,
               message: 'update_category',
-              data: dataCategory
+              data: ipdateCategory
   
   
           })
