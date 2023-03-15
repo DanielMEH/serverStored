@@ -1,6 +1,6 @@
 
 
-abstract class Caterorys{
+abstract class Categorys{
     public async createCategory(){}
     public async getCategory(){}
     public async getCategoryId(){}
