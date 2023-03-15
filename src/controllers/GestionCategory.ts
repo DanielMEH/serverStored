@@ -1,6 +1,6 @@
 
 
-abstract class Caterorys{
+abstract class Categorys{
     public async createCategory(){}
     public async getCategory(){}
     public async getCategoryId(){}
@@ -9,4 +9,4 @@ abstract class Caterorys{
     public async getCategoryProducts(){}
 }
 
-export default Caterorys;
+export default Categorys;
