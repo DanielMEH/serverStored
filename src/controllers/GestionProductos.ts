@@ -7,7 +7,7 @@ abstract class ManageProducts {
     const {
       iva,
       name,
-      category,
+      idCategory,
       price,
       priceBuy,
       imgURL,
@@ -20,7 +20,7 @@ abstract class ManageProducts {
     const product: Product = new ProductSchema({
       iva,
       name,
-      category,
+      idCategory,
       price,
       priceBuy,
       imgURL,
