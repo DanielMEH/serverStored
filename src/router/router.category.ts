@@ -21,12 +21,12 @@ class RouterCategory extends Categorys{
     }
 
     public PutCategory(){
-        router.put('/category/:id',this.putCategory)
+        router.put('/category/:_id',this.putCategory)
         return router;
     }
 
     public DeleteCategory(){
-        router.delete('/category/:id',this.deleteCategory)
+        router.delete('/category/:_id',this.deleteCategory)
         return router;
     }
 
