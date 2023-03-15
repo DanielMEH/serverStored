@@ -5,7 +5,7 @@ export interface Product extends mongoose.Document{
     iva: number;
     name: string;
     tokeIdUser: string;
-    category: string;
+    idCategory: string;
     price: number;
     priceBuy:number;
     description: string;
