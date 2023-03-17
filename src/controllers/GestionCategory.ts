@@ -1,10 +1,9 @@
-<<<<<<< HEAD
 import { Request, Response, NextFunction } from "express";
 import CategorySchema from "../models/CategoryM";
 import { category } from "../interfaces/CategoryI";
 import jwt from "jsonwebtoken";
 import { SECRET } from "../config/config"; 
-abstract class Caterorys {
+abstract class Categorys {
 
 
   public async createCategory(
@@ -17,13 +16,8 @@ abstract class Caterorys {
       const {name_category,description,imgURL,imgId} = req.body;    
       const Tokenid_U:any = req.headers["x-id-token"]  
       const verifyToken: Array<any> | any = jwt.verify( Tokenid_U, SECRET )!;
-
       const tokeIdUser = verifyToken.id;
-      console.log(verifyToken);
-      console.log(tokeIdUser);
       
-      
-
       if(!tokeIdUser){
         return res.status(400).json({
           ok: false,
@@ -226,17 +220,6 @@ console.log("hola");
     res: Response,
     next: Partial<NextFunction>
   ): Promise<Response | Request | any> {}
-=======
-
-
-abstract class Categorys{
-    public async createCategory(){}
-    public async getCategory(){}
-    public async getCategoryId(){}
-    public async putCategory(){}
-    public async deleteCategory(){}
-    public async getCategoryProducts(){}
->>>>>>> 9e54fe591955605a5cdc8e87ab7675ecea87b3c5
 }
 
 export default Categorys;
