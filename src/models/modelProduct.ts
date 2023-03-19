@@ -8,10 +8,11 @@ const ProductSchema = new Schema({
   idCategory: String,
   price: Number,
   priceBuy: Number,
-  imgURL: { type: String, unique: true, required: true, lowercase: true },
+  imgURL: { type: String, lowercase: true },
   imgId: Number,
   description: String,
-  caducidad: Date,
+  fechaInicio: String,
+  fechaFin: String,
   tokeIdUser: { type: String, require: true, unique: true },
   
 },

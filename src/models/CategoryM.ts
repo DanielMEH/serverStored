@@ -7,8 +7,8 @@ const CategorySchema = new Schema({
     tokeIdUser: { type: String, require: true },
     name_category: { type: String, require: true },
     description: { type: String, require: true },
-    imgURL: { type: String,  required: true, lowercase: true },
-    imgId: {type: String, },
+    imgURL: { type: String},
+    imgId: {type: String },
     
 },{
     timestamps:true

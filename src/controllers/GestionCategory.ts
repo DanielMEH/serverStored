@@ -1,10 +1,9 @@
-<<<<<<< HEAD
 import { Request, Response, NextFunction } from "express";
 import CategorySchema from "../models/CategoryM";
 import { category } from "../interfaces/CategoryI";
 import jwt from "jsonwebtoken";
 import { SECRET } from "../config/config"; 
-abstract class Caterorys {
+abstract class Categorys {
 
 
   public async createCategory(
@@ -12,18 +11,15 @@ abstract class Caterorys {
     res: Response,
     next: Partial<NextFunction>
   ): Promise<Response | Request | any> {
+    console.log(req.body);
+    
     try {
       
-      const {name_category,description,imgURL,imgId} = req.body;    
+      const {name_category,description,imgURL,imgId} = req.body.data;    
       const Tokenid_U:any = req.headers["x-id-token"]  
       const verifyToken: Array<any> | any = jwt.verify( Tokenid_U, SECRET )!;
-
       const tokeIdUser = verifyToken.id;
-      console.log(verifyToken);
-      console.log(tokeIdUser);
       
-      
-
       if(!tokeIdUser){
         return res.status(400).json({
           ok: false,
@@ -38,10 +34,10 @@ abstract class Caterorys {
           imgId
         })
         const dataCategory = await data.save();
-        console.log(dataCategory);
+
         
-          return res.status(200).json({
-              ok: true,
+          return res.status(201).json({
+              status : 201,
               message: 'Categoria creada',
               data: dataCategory
   
@@ -66,10 +62,11 @@ abstract class Caterorys {
     res: Response,
     next: Partial<NextFunction>
   ): Promise<Response | Request | any> {
-console.log("hola");
+
+    
 
    try {
-    const Tokenid_U:any = req.headers["x-id-token"]  
+    const Tokenid_U:any = req.params.id  
     const verifyToken: Array<any> | any = jwt.verify( Tokenid_U, SECRET )!;
 
     const tokeIdUser = verifyToken.id;
@@ -139,18 +136,15 @@ console.log("hola");
     next: Partial<NextFunction>
   ): Promise<Response | Request | any> {
 
-    console.log(req.params._id);
+    console.log("---",req.params._id);
+    console.log("body",req.body);
     try {
       
-      const {name_category,description,imgURL,imgId} = req.body;    
+      const {name_category,description} = req.body.data;    
       const Tokenid_U:any = req.headers["x-id-token"]  
       const verifyToken: Array<any> | any = jwt.verify( Tokenid_U, SECRET )!;
 
       const tokeIdUser = verifyToken.id;
-      console.log(verifyToken);
-      console.log(tokeIdUser);
-      
-      
 
       if(!tokeIdUser){
         return res.status(400).json({
@@ -159,7 +153,7 @@ console.log("hola");
       })
       }else{
       
-        const ipdateCategory = await CategorySchema.findByIdAndUpdate(req.params._id,req.body,{
+        const ipdateCategory = await CategorySchema.findByIdAndUpdate(req.params._id,req.body.data,{
           new: true
         });
           return res.status(200).json({
@@ -190,6 +184,7 @@ console.log("hola");
   ): Promise<Response | Request | any> {
     try {
       const Tokenid_U:any = req.headers["x-id-token"]  
+      
       const verifyToken: Array<any> | any = jwt.verify( Tokenid_U, SECRET )!;
   
       const tokeIdUser = verifyToken.id;
@@ -226,17 +221,6 @@ console.log("hola");
     res: Response,
     next: Partial<NextFunction>
   ): Promise<Response | Request | any> {}
-=======
-
-
-abstract class Categorys{
-    public async createCategory(){}
-    public async getCategory(){}
-    public async getCategoryId(){}
-    public async putCategory(){}
-    public async deleteCategory(){}
-    public async getCategoryProducts(){}
->>>>>>> 9e54fe591955605a5cdc8e87ab7675ecea87b3c5
 }
 
 export default Categorys;

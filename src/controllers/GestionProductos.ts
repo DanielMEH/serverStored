@@ -13,7 +13,8 @@ abstract class ManageProducts {
       imgURL,
       imgId,
       description,
-      caducidad,
+      fechaInicio,
+      fechaFin
     } = req.body;
     console.log(req.body);
 
@@ -26,7 +27,8 @@ abstract class ManageProducts {
       imgURL,
       imgId,
       description,
-      caducidad,  
+      fechaInicio,
+      fechaFin 
     });
   const produ =  await product.save();
   console.log(produ);
