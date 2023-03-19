@@ -6,7 +6,7 @@ import { SECRET } from "../config/config";
 abstract class Categorys {
 
 
-  public async createCategory(
+  public async createCategory( 
     req: Request,
     res: Response,
     next: Partial<NextFunction>

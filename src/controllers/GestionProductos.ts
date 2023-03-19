@@ -1,6 +1,8 @@
 import { Product } from "./../interfaces/product";
 import { Request, Response, NextFunction } from "express";
 import ProductSchema from "../models/modelProduct";
+import jwt from "jsonwebtoken";
+import { SECRET } from "../config/config";
 
 abstract class ManageProducts {
   public async postProducts(req: Request, res: Response) {
@@ -18,9 +20,11 @@ abstract class ManageProducts {
       console.log(req.body);
 
       const tokenCreate: string = req.headers["id-token"] as string;
+      const verifyToken: Array<any> | any = jwt.verify(tokenCreate, SECRET)!;
+      const tokenIdUser = verifyToken.id;
       console.log(tokenCreate);
 
-      if (!tokenCreate) {
+      if (!tokenIdUser) {
         return res
           .status(400)
           .json({ ok: false, message: "No existe el token" });
@@ -28,6 +32,7 @@ abstract class ManageProducts {
         const product: Product = new ProductSchema({
           iva,
           name,
+          tokenIdUser,
           idCategory,
           price,
           priceBuy,
@@ -55,7 +60,20 @@ abstract class ManageProducts {
     next: NextFunction
   ): Promise<Response | Request | any> {
     try {
-      const products: Product[] = await ProductSchema.find();
+
+      const tokenCreate: string = req.headers["id-token"] as string;
+      const verifyToken: Array<any> | any = jwt.verify(tokenCreate, SECRET)!;
+      const tokenIdUser = verifyToken.id;
+
+      if (!tokenIdUser) {
+        return res
+          .status(400)
+          .json({ ok: false, message: "No existe el token" });
+      }
+
+      const products: Product[] = await ProductSchema.find({
+        tokenIdUser,
+      });
       console.log(products);
       return res.status(200).json({ ok: true, products });
     } catch (error) {
@@ -71,7 +89,20 @@ abstract class ManageProducts {
     next: NextFunction
   ): Promise<Response | Request | any> {
     try {
-      const product = await ProductSchema.findById(req.params.id);
+
+      const tokenCreate: string = req.headers["id-token"] as string;
+      const verifyToken: Array<any> | any = jwt.verify(tokenCreate, SECRET)!;
+      const tokenIdUser = verifyToken.id;
+
+      if (!tokenIdUser) {
+        return res
+          .status(400)
+          .json({ ok: false, message: "No existe el token" });
+      }
+
+      const product = await ProductSchema.findById(req.params.id, {
+        tokenIdUser,
+      });
       console.log(product);
       return res.status(200).json({ ok: true, product });
     } catch (error) {
@@ -88,8 +119,17 @@ abstract class ManageProducts {
     next: NextFunction
   ): Promise<Response | Request> {
     try {
+      const tokenCreate: string = req.headers["id-token"] as string;
+      const verifyToken: Array<any> | any = jwt.verify(tokenCreate, SECRET)!;
+      const tokenIdUser = verifyToken.id;
+
+      if (!tokenIdUser) {
+        return res
+          .status(400)
+          .json({ ok: false, message: "No existe el token" });
+      }
       const idCategory = req.params.idCategory;
-      const product = await ProductSchema.find({ idCategory });
+      const product = await ProductSchema.find({ idCategory }, { tokenIdUser });
       console.log(product);
       return res.status(200).json({ ok: true, product });
     } catch (error) {
@@ -106,8 +146,19 @@ abstract class ManageProducts {
     next: NextFunction
   ): Promise<Response | Request | any> {
     try {
+
+      const tokenCreate: string = req.headers["id-token"] as string;
+      const verifyToken: Array<any> | any = jwt.verify(tokenCreate, SECRET)!;
+      const tokenIdUser = verifyToken.id;
+
+      if (!tokenIdUser) {
+        return res
+          .status(400)
+          .json({ ok: false, message: "No existe el token" });
+      }
+
       const product = await ProductSchema.findByIdAndUpdate(
-        req.params._id,
+        { _id: req.params.id, tokenIdUser },
         req.body,
         { new: true }
       );
@@ -130,7 +181,18 @@ abstract class ManageProducts {
     next: NextFunction
   ): Promise<Response | Request | any> {
     try {
-      const product = await ProductSchema.findByIdAndDelete(req.params.id);
+
+
+      const tokenCreate: string = req.headers["id-token"] as string;
+      const verifyToken: Array<any> | any = jwt.verify(tokenCreate, SECRET)!;
+      const tokenIdUser = verifyToken.id;
+
+      if (!tokenIdUser) {
+        return res
+          .status(400)
+          .json({ ok: false, message: "No existe el token" });
+      }
+      const product = await ProductSchema.findByIdAndDelete(req.params.id,{tokenIdUser});
       return res
         .status(200)
         .json({ ok: true, message: "Product Delete", product });
