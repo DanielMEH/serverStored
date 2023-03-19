@@ -16,13 +16,8 @@ abstract class Categorys {
       const {name_category,description,imgURL,imgId} = req.body;    
       const Tokenid_U:any = req.headers["x-id-token"]  
       const verifyToken: Array<any> | any = jwt.verify( Tokenid_U, SECRET )!;
-
       const tokeIdUser = verifyToken.id;
-      console.log(verifyToken);
-      console.log(tokeIdUser);
       
-      
-
       if(!tokeIdUser){
         return res.status(400).json({
           ok: false,
