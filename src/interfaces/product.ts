@@ -9,6 +9,7 @@ export interface Product extends mongoose.Document{
     price: number;
     priceBuy:number;
     description: string;
+    fechaCreacion: string;
     caducidad: Date;
     timestamps: boolean;
 }
