@@ -145,7 +145,6 @@ abstract class Categorys {
       const verifyToken: Array<any> | any = jwt.verify( Tokenid_U, SECRET )!;
 
       const tokeIdUser = verifyToken.id;
-
       if(!tokeIdUser){
         return res.status(400).json({
           ok: false,

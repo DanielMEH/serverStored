@@ -1,4 +1,4 @@
-import mongoose, { Schema, model } from "mongoose";
+import  { Schema, model } from "mongoose";
 import { Product } from "../interfaces/product";
 //import autoincrement from "mongoose-auto-increment";
 
@@ -8,11 +8,9 @@ const ProductSchema = new Schema({
   idCategory: String,
   price: Number,
   priceBuy: Number,
-  imgURL: { type: String, lowercase: true },
-  imgId: Number,
   description: String,
-  fechaInicio: String,
-  fechaFin: String,
+  fechaCreacion: String,
+  caducidad: Date,
   tokeIdUser: { type: String, require: true, unique: true },
   
 },

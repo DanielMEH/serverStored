@@ -15,7 +15,7 @@ class RouterProducts extends ManageProducts{
       return router;
     }
     public GetproductsIdCategory(){
-    router.get('/productsCategory/:id',this.getProductsIdCategory);
+    router.get('/productsCategory/:idCategory',this.getProductsIdCategory);
       return router;
     }
 
@@ -24,8 +24,8 @@ class RouterProducts extends ManageProducts{
       return router;
     }
 
-    public PutProduct(){
-    router.put('updatProducts/:id',this.putProducts);
+    public PutProducts(){
+    router.put('updateProducts/:id',this.putProducts);
       return router;
     }
 
@@ -34,6 +34,5 @@ class RouterProducts extends ManageProducts{
       return router;
     }
 }
-
 
 export default RouterProducts;

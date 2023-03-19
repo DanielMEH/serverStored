@@ -60,7 +60,7 @@ const startServer = () => {
         AppServer.use(new RouterProducts().GetproductsId())
         AppServer.use(new RouterProducts().GetproductsIdCategory())
         AppServer.use(new RouterProducts().PostProduct())
-        AppServer.use(new RouterProducts().PutProduct())
+        AppServer.use(new RouterProducts().PutProducts())
         AppServer.use(new RouterProducts().DeleteProduct())
 
         // Here there are routes Categories
