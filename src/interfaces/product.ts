@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 export interface Product extends mongoose.Document{
     iva: number;
     name: string;
-    tokeIdUser: string;
+    tokenIdUser: string;
     idCategory: string;
     price: number;
     priceBuy:number;
