@@ -81,9 +81,7 @@ public async getAdminData(req: any,
           const { country_name,city,longitude,
                       latitude,country_calling_code,languages,ip,
                       network,version } = data;
-          console.log(country_name,city,longitude,
-                      latitude,country_calling_code,languages,ip,
-                      network,version);
+       
 
         let cuenta = "Stored"
         let state = "activo"
@@ -94,7 +92,7 @@ public async getAdminData(req: any,
         conn.query(`CALL ADMIN_INSERT_LOGIN('${datas.correo}','${fecha}','${hora}',
         '${rol}','${cuenta}','${ip}','${country_name}','${city}','${country_calling_code}',
         '${languages}','${longitude}','${latitude}','${state}','${tc}','${authCount}','${hasPassword}')`, async ( error: Array<Error> | any, rows: any ) => {
-          console.log(error);
+       
           
 
               if ( error ) {
@@ -130,7 +128,7 @@ public async getAdminData(req: any,
     res: Response,
     next: Partial<NextFunction>
   ): Promise<Response | Request | any> {
-    console.log(req.body);
+    
     
     try {
       const data: login = {
@@ -166,14 +164,14 @@ public async getAdminData(req: any,
       }else
 
       conn.query(`CALL USER_LOGIN('${data.correo}')`,async(error,rows)=>{
-        console.log(rows);
+       
         if (error) return res.status(400).json({message:"ERROR_DB",error:error})
         const validPassword = await bcrypt.compare( data.password, rows[0][0].password );
         if ( validPassword ) {
           conn.query(`CALL USER_LOGIN_MODULO('${rows[0][0].idAccount}')`,(error,rowsP)=>{
              if (error) return res.status(400).json({message:"ERROR_DB",error:error})
              let modulo = rowsP[0]
-             console.log(rows[0][0].idAccount);
+           
              const token: any = jwt.sign({id:rows[0][0].idAccount},
                SECRET || "authToken",
                {expiresIn: 60 * 60 * 24}
@@ -206,7 +204,7 @@ public async getAdminData(req: any,
     try {
       const conn = await conexion.connect();
       const {email, name, picture} = req.body.data;
-      console.log(email, name, picture);
+     
       
       const fecha = momet().format('MMMM Do YYYY');
       const hora = momet().format('h:mm:ss a');
@@ -252,9 +250,7 @@ public async getAdminData(req: any,
               const { country_name,city,longitude,
                           latitude,country_calling_code,languages,ip,
                           network,version } = data;
-              console.log(country_name,city,longitude,
-                          latitude,country_calling_code,languages,ip,
-                          network,version);
+              
 
             let cuenta = "Google"
             let state = "activo"
@@ -264,7 +260,7 @@ public async getAdminData(req: any,
             conn.query(`CALL AUTH_GOOGLE('${email}', '${name}', '${picture}','${fecha}','${hora}',
             '${rol}','${cuenta}','${ip}','${country_name}','${city}','${country_calling_code}',
             '${languages}','${longitude}','${latitude}','${state}','${tc}','${authCount}')`, async ( error: Array<Error> | any, rows: any ) => {
-              console.log(error);
+            
               
                      if ( rows ) {
                       
@@ -592,7 +588,7 @@ public async getAdminData(req: any,
 
       );
     } catch ( error ) {
-      console.log(error);
+      
       
       return res.status( 400 ).json( { error } );
     }
@@ -734,7 +730,7 @@ public async getAdminData(req: any,
     try {
       
       let tokenIdAcc: any = req.headers["isallowed-x-token"];
-      console.log(tokenIdAcc);
+     
       
       const verifyToken: Array<any> | any = jwt.verify( tokenIdAcc, SECRET )!;
       const { id } = verifyToken; 
@@ -788,10 +784,9 @@ public async getAdminData(req: any,
       }
 
     } catch (error) {
-      res.send("error")
-      console.log(error);
+      return res.status(400).json( { message: "ERROR_SESSION" } );
+    
       
-      return error
     }
 
 
@@ -820,7 +815,7 @@ public async getAdminData(req: any,
 
     } catch (error) {
       res.send("error")
-      console.log(error);
+    
       
       return error
     }
@@ -846,10 +841,7 @@ public async getAdminData(req: any,
       }
 
     } catch (error) {
-      res.send("error")
-      console.log(error);
-      
-      return error
+      return res.status(400).json( { message: "ERROR_SESSION" } );
     }
 
 
@@ -867,7 +859,7 @@ public async getAdminData(req: any,
         const conn = await conexion.connect();
         
         conn.query(`CALL ADMIN_UPDATE_DATA('${id}','${req.body.name}','${req.body.lastname}','${req.body.email}')`,(error,rows)=>{
-          console.log(error);
+         
           if (rows) {
             return res.status(200).json( { message: "UPDATE_ADMIN_USER" } );
           }else{
@@ -877,10 +869,7 @@ public async getAdminData(req: any,
       }
 
     } catch (error) {
-      res.send("error")
-      console.log(error);
-      
-      return error
+      return res.status(400).json( { message: "ERROR_SESSION" } );
     }
   }
   public async deleteModule(
@@ -897,7 +886,7 @@ public async getAdminData(req: any,
           if (rows) {
             return res.status(200).json( { message: "DELETE_MODULE_USER" } );
           }else{
-            console.log(error);
+           
             
             return res.status(400).json( { message: "ERROR_DELETE_MODULE_USER" } );
           }
@@ -905,10 +894,7 @@ public async getAdminData(req: any,
       }
 
     } catch (error) {
-      res.send("error")
-      console.log(error);
-      
-      return error
+      return res.status(400).json( { message: "ERROR_SESSION" } );
     }
   }
   public async setModule(
@@ -926,7 +912,7 @@ public async getAdminData(req: any,
             if (rows) {
               return res.status(200).json( { message: "SET_MODULE_USER", data:row} );
             }else{
-              console.log(error);
+             
               
               return res.status(400).json( { message: "ERROR_SET_MODULE_USER" } );
             }
@@ -936,10 +922,7 @@ public async getAdminData(req: any,
       }
 
     } catch (error) {
-      res.send("error")
-      console.log(error);
-      
-      return error
+     return res.status(400).json( { message: "ERROR_SESSION" } );
     }
   }
   public async setPermisionModule(
@@ -962,10 +945,7 @@ public async getAdminData(req: any,
       }
 
     } catch (error) {
-      res.send("error")
-      console.log(error);
-      
-      return error
+      return res.status(400).json( { message: "ERROR_SESSION" } );
     }
   }
   public async deletePermisionModule(
@@ -988,10 +968,7 @@ public async getAdminData(req: any,
       }
 
     } catch (error) {
-      res.send("error")
-      console.log(error);
-      
-      return error
+      return res.status(400).json( { message: "ERROR_SESSION" } );
     }
   }
  
@@ -1006,7 +983,7 @@ public async getAdminData(req: any,
       if(id){
         const conn = await conexion.connect();
         conn.query(`CALL GET_MODULE_ACCOUNT_USER('${id}')`,(error,rows)=>{
-          console.log(rows);
+         
           
           if (rows) {
             return res.status(200).json( { message: "GET_MODULES_USER",data:rows[0] } );
@@ -1063,7 +1040,7 @@ public async getAdminData(req: any,
       if(id){
         let url_imagen = null;
         let id_img = null;
-        console.log(req.files?.imgData.tempFilePath);
+       
         
       if(req.files?.imgData){
 
@@ -1106,11 +1083,6 @@ public async getAdminData(req: any,
     next: Partial<NextFunction>
   ):Promise< Request|Response |any>{
     try {
-
-      console.log(req.body);
-     
-      
-      
 
       const verifyToken: Array<any> | any = jwt.verify( req.headers["token-x-id"], SECRET )!;
       const { id } = verifyToken;

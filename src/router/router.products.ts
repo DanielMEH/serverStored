@@ -6,12 +6,12 @@ import ManageProducts from '../controllers/GestionProductos'
 class RouterProducts extends ManageProducts{
    
     public Getproducts(){
-    router.get('/getProducts',this.getProducts );
+    router.get('/getProducts/:_id',this.getProducts );
       return router;    
    }
 
     public GetproductsId(){
-    router.get('/getProducts/:id',this.getProductsId);
+    router.get('/getProductsId/:id',this.getProductsId);
       return router;
     }
     public GetproductsIdCategory(){
@@ -25,7 +25,7 @@ class RouterProducts extends ManageProducts{
     }
 
     public PutProducts(){
-    router.put('updateProducts/:id',this.putProducts);
+    router.put('/updateProducts/:id',this.putProducts);
       return router;
     }
 

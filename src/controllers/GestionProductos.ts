@@ -6,23 +6,23 @@ import { SECRET } from "../config/config";
 
 abstract class ManageProducts {
   public async postProducts(req: Request, res: Response) {
+ 
     try {
       const {
         iva,
         name,
-        idCategory,
+        category,
         price,
         priceBuy,
-        fechaCreacion,
+        fechaInicio,
         description,
-        caducidad,
-      } = req.body;
-      console.log(req.body);
+        fechaFin,
+      } = req.body.data;
+    
 
-      const tokenCreate: string = req.headers["id-token"] as string;
+      const tokenCreate: string = req.headers["x-id-token"] as string;
       const verifyToken: Array<any> | any = jwt.verify(tokenCreate, SECRET)!;
       const tokenIdUser = verifyToken.id;
-      console.log(tokenCreate);
 
       if (!tokenIdUser) {
         return res
@@ -33,18 +33,18 @@ abstract class ManageProducts {
           iva,
           name,
           tokenIdUser,
-          idCategory,
+          category,
           price,
           priceBuy,
-          fechaCreacion,
+          fechaInicio,
           description,
-          caducidad,
+          fechaFin,
         });
         const produ = await product.save();
 
         return res
           .status(200)
-          .json({ ok: true, message: "Producto creado correctamente" });
+          .json({ ok: true, message: "Producto creado correctamente",data: produ });
       }
     } catch (error) {
       console.log(error);
@@ -61,7 +61,9 @@ abstract class ManageProducts {
   ): Promise<Response | Request | any> {
     try {
 
-      const tokenCreate: string = req.headers["id-token"] as string;
+      const tokenCreate: string = req.params._id;
+     
+      
       const verifyToken: Array<any> | any = jwt.verify(tokenCreate, SECRET)!;
       const tokenIdUser = verifyToken.id;
 
@@ -74,13 +76,13 @@ abstract class ManageProducts {
       const products: Product[] = await ProductSchema.find({
         tokenIdUser,
       });
-      console.log(products);
+     
       return res.status(200).json({ ok: true, products });
     } catch (error) {
-      console.log(error);
+    
       return res
         .status(500)
-        .json({ ok: false, message: "Error en el servidor" });
+        .json({ ok: false, message: error });
     }
   }
   public async getProductsId(
@@ -100,11 +102,9 @@ abstract class ManageProducts {
           .json({ ok: false, message: "No existe el token" });
       }
 
-      const product = await ProductSchema.findById(req.params.id, {
-        tokenIdUser,
-      });
+      const product = await ProductSchema.findById(req.params.id);
       console.log(product);
-      return res.status(200).json({ ok: true, product });
+      return res.status(200).json({ ok: true, data: product });
     } catch (error) {
       console.log(error);
       return res
@@ -145,6 +145,8 @@ abstract class ManageProducts {
     res: Response,
     next: NextFunction
   ): Promise<Response | Request | any> {
+    console.log("body",req.body);
+    
     try {
 
       const tokenCreate: string = req.headers["id-token"] as string;
@@ -157,11 +159,9 @@ abstract class ManageProducts {
           .json({ ok: false, message: "No existe el token" });
       }
 
-      const product = await ProductSchema.findByIdAndUpdate(
-        { _id: req.params.id, tokenIdUser },
-        req.body,
-        { new: true }
-      );
+      const product = await ProductSchema.findByIdAndUpdate(req.params.id,req.body.data,{
+        new: true,
+      });
       console.log(product);
 
       return res
