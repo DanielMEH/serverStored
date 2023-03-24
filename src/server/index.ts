@@ -35,7 +35,7 @@ const startServer = () => {
 
         // Here go the Routes Inicio
 
-        AppServer.use(new RouterInicio().GetModules)
+        AppServer.use(new RouterInicio().GetModules())
 
        // Here go the Routes User
         AppServer.use(new RouterUser().registerAdmin()); 

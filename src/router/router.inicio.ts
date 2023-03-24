@@ -5,7 +5,7 @@ const router:Router = Router()
 
 class RouterInicio extends AllModules{
     public GetModules (){
-        router.get('/modules',this.getModules)
+        router.get('/modules/:id',this.getModules)
         return router;
     }
 }

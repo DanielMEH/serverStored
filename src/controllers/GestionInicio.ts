@@ -1,13 +1,18 @@
  import { Request, Response, NextFunction, json } from 'express';
  import ProductSchema from "../models/modelProduct";
+import CategorySchema from '../models/CategoryM';
+import ProviderSchema from '../models/modelProviders';
 import { Product } from '../interfaces/product';
 import jwt from 'jsonwebtoken';
 import { SECRET } from '../config/config';
+import CategoryM from '../models/CategoryM';
+
+
   
-abstract class AllModules{
+ class AllModules {
 
     public async getModules(
-        req:Request, res:Response,
+        req:Request |any, res:Response|any,
         next:NextFunction
     ):Promise<Request|Response|any>{
         try {
@@ -21,17 +26,19 @@ abstract class AllModules{
                 message:"El token no existe!"
             })
           }
-          const dataProduct:Product[] = await ProductSchema.find(TokenIdUser)
-          console.log(dataProduct);
-          return res.status(200).json({ ok: true, dataProduct}
-          )
+          
+          const dataProduct:Product[] = await ProductSchema.find({TokenIdUser})
+          const dataCategory = await CategorySchema.findById({TokenIdUser})
+          const dataProvider = await ProviderSchema.findById({TokenIdUser})
+          
+          return res.status(200).json({ ok: true, dataCategory,dataProduct,dataProvider})
+         
+         
           
         } catch (error) {
            return res.status(500).json({error, message : 'ERROR_SERVER'})            
         }
     }
-
-
 
 
 }
