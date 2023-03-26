@@ -7,6 +7,7 @@ import RouterUser from "../router/router";
 import RouterProducts from '../router/router.products'
 import RouterCategory from '../router/router.category'
 import RouterProviders from '../router/router.providers'
+import RouterInventory from '../router/router.inventary'
 import {connect} from '../database/mongodb'
 mongoose.set('strictQuery', true);
 const AppServer: express.Application = express();
@@ -78,6 +79,14 @@ const startServer = () => {
         AppServer.use(new RouterProviders().PutProviders())
         AppServer.use(new RouterProviders().DeleteProviders())
         AppServer.use(new RouterProviders().GetProvidersProducts())
+        // inventory
+        AppServer.use(new RouterInventory().GetInventory())
+        AppServer.use(new RouterInventory().GetInventoryId())
+        AppServer.use(new RouterInventory().DeleteInventoryId())
+        AppServer.use(new RouterInventory().PutInventoryId())
+      
+
+
 
         // Here connect MongoDB
         const con =  connect()

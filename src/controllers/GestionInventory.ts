@@ -14,4 +14,3 @@ class InventoryProduct {
 }
 
 export default InventoryProduct;
-

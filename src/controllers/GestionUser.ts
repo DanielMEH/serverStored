@@ -70,10 +70,16 @@ public async getAdminData(req: any,
         let estado = "activo"
         const conn = await conexion.connect();
         conn.query( "SELECT * FROM admin", async ( error, rows ) => {
-          for ( let i = 0; i < rows.length; i++ ) {
-            if ( rows[i].correo == datas.correo )
-              return res.status(400).json( { message: "ERR_EXIST_EMAIL" } );
-          }
+          console.log(error);
+          
+        if (rows.length < 0) {
+          
+          return res.status(400).json( { message: "ERROR_DATA_ADMIN" } );
+        }
+        for ( let i = 0; i < rows.length; i++ ) {
+          if ( rows[i].correo == datas.correo )
+            return res.status(400).json( { message: "ERR_EXIST_EMAIL" } );
+        }
 
           const url = 'https://ipapi.co/json/';
           const response = await fetch(url);
@@ -164,15 +170,25 @@ public async getAdminData(req: any,
       }else
 
       conn.query(`CALL USER_LOGIN('${data.correo}')`,async(error,rows)=>{
+       console.log(error);
        
         if (error) return res.status(400).json({message:"ERROR_DB",error:error})
+        console.log(rows[0]);
+        console.log("Hola");
+        
+        
         const validPassword = await bcrypt.compare( data.password, rows[0][0].password );
         if ( validPassword ) {
           conn.query(`CALL USER_LOGIN_MODULO('${rows[0][0].idAccount}')`,(error,rowsP)=>{
              if (error) return res.status(400).json({message:"ERROR_DB",error:error})
-             let modulo = rowsP[0]
+             let modulo:any = rowsP[0]
            
-             const token: any = jwt.sign({id:rows[0][0].idAccount},
+             const token: any = jwt.sign({id:rows[0][0].idUsers1},
+               SECRET || "authToken",
+               {expiresIn: 60 * 60 * 24}
+             
+             );
+             const token1: any = jwt.sign({id1:rows[0][0].idAccount},
                SECRET || "authToken",
                {expiresIn: 60 * 60 * 24}
              
@@ -180,7 +196,7 @@ public async getAdminData(req: any,
        
              
              return res.status(200).json({message:"LOGIN_SUCCESSFULL",token,auth:true,
-           module:modulo,type:"user"})
+           module:modulo,type:"user",token1})
              
              
           })
@@ -220,6 +236,8 @@ public async getAdminData(req: any,
                  
                  conn.query("SELECT idUsers,rol FROM admin WHERE correo = ?",
                          [email], async ( error: Array<Error> | any, rows: any ) => {
+                          console.log(rows,error);
+                          
                             if ( error ) return res.status( 400 ).json( { message: "ERROR_DB", error: error } );
                           conn.query(`UPDATE admin SET estado = '${estado}' WHERE correo = '${email}'`)
                            
@@ -261,13 +279,14 @@ public async getAdminData(req: any,
             '${rol}','${cuenta}','${ip}','${country_name}','${city}','${country_calling_code}',
             '${languages}','${longitude}','${latitude}','${state}','${tc}','${authCount}')`, async ( error: Array<Error> | any, rows: any ) => {
             
+              console.log(error,rows);
               
                      if ( rows ) {
                       
                         
                        conn.query("SELECT idUsers ,rol FROM admin WHERE correo = ?",
                          [email], async ( error: Array<Error> | any, rows: any ) => {
-                          
+                          console.log(error,rows);
                           
                             if ( error ) return res.status( 400 ).json( { message: "ERROR_DB", error: error } );
                            if ( rows.length > 0 ) {
@@ -352,10 +371,12 @@ public async getAdminData(req: any,
         const hasPassword = await bcrypt.hash( data.password, encriptarPassword );
         const conn = await conexion.connect();
         conn.query( "SELECT * FROM account", async ( error, rows ) => {
-          for ( let i = 0; i < rows.length; i++ ) {
-            if ( rows[i].correo == data.correo )
-              return res.json( { message: "ERR_MAIL_EXIST_USER", status: 302 } );
-          
+          if(rows.length > 0){
+            for ( let i = 0; i < rows.length; i++ ) {
+              if ( rows[i].correo == data.correo )
+                return res.json( { message: "ERR_MAIL_EXIST_USER", status: 302 } );
+            
+            }
           }
           conn.query(
             `CALL CREATE_USER('${data.correo}','${hasPassword}','${fecha}','${verifyToken.id}','${hora}','${req.body.postDataUserRegister.estado}')`,
@@ -977,12 +998,16 @@ public async getAdminData(req: any,
     res: Response,
     next: Partial<NextFunction>
   ):Promise< Request|Response |any>{
+    console.log(req.params);
+    
     try {
       const verifyToken: Array<any> | any = jwt.verify( req.params.id, SECRET )!;
-      const { id } = verifyToken;
-      if(id){
+    
+      
+      const { id1 } = verifyToken;
+      if(id1){
         const conn = await conexion.connect();
-        conn.query(`CALL GET_MODULE_ACCOUNT_USER('${id}')`,(error,rows)=>{
+        conn.query(`CALL GET_MODULE_ACCOUNT_USER('${id1}')`,(error,rows)=>{
          
           
           if (rows) {

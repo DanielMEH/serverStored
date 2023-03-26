@@ -11,7 +11,6 @@ abstract class Categorys {
     res: Response,
     next: Partial<NextFunction>
   ): Promise<Response | Request | any> {
-    console.log(req.body);
     
     try {
       
@@ -19,6 +18,7 @@ abstract class Categorys {
       const Tokenid_U:any = req.headers["x-id-token"]  
       const verifyToken: Array<any> | any = jwt.verify( Tokenid_U, SECRET )!;
       const tokeIdUser = verifyToken.id;
+      console.log(tokeIdUser);
       
       if(!tokeIdUser){
         return res.status(400).json({
@@ -34,6 +34,8 @@ abstract class Categorys {
           imgId
         })
         const dataCategory = await data.save();
+        console.log(dataCategory);
+        
 
         
           return res.status(201).json({
@@ -46,6 +48,8 @@ abstract class Categorys {
       }
         
     } catch (error) {
+      console.log("error categoria");
+      
         return res.status(500).json({
             ok: false,
             message: 'Error al crear la categoria',
