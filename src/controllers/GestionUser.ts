@@ -164,7 +164,7 @@ public async getAdminData(req: any,
       }else
 
       conn.query(`CALL USER_LOGIN('${data.correo}')`,async(error,rows)=>{
-       
+        console.log(rows)
         if (error) return res.status(400).json({message:"ERROR_DB",error:error})
         const validPassword = await bcrypt.compare( data.password, rows[0][0].password );
         if ( validPassword ) {
@@ -172,14 +172,20 @@ public async getAdminData(req: any,
              if (error) return res.status(400).json({message:"ERROR_DB",error:error})
              let modulo = rowsP[0]
            
-             const token: any = jwt.sign({id:rows[0][0].idAccount},
+             const token: any = jwt.sign({id:rows[0][0].idUsers1},
                SECRET || "authToken",
                {expiresIn: 60 * 60 * 24}
              
              );
+
+             const token1: any = jwt.sign({id1:rows[0][0].idAccount},
+              SECRET || "authToken",
+              {expiresIn: 60 * 60 * 24}
+            
+            );
        
              
-             return res.status(200).json({message:"LOGIN_SUCCESSFULL",token,auth:true,
+             return res.status(200).json({message:"LOGIN_SUCCESSFULL",token,token1,auth:true,
            module:modulo,type:"user"})
              
              
@@ -878,8 +884,13 @@ public async getAdminData(req: any,
     next: Partial<NextFunction>
   ):Promise< Request|Response |any>{
     try {
+
+      console.log(req.body);
+      
       const verifyToken: Array<any> | any = jwt.verify( req.headers["isallowed-x-token"], SECRET )!;
       const { id } = verifyToken;
+      
+      
       if(id){
         const conn = await conexion.connect();
         conn.query(`CALL DELETE_MODULE_USER('${req.body.id}')`,(error,rows)=>{
@@ -979,10 +990,10 @@ public async getAdminData(req: any,
   ):Promise< Request|Response |any>{
     try {
       const verifyToken: Array<any> | any = jwt.verify( req.params.id, SECRET )!;
-      const { id } = verifyToken;
-      if(id){
+      const { id1 } = verifyToken;
+      if(id1){
         const conn = await conexion.connect();
-        conn.query(`CALL GET_MODULE_ACCOUNT_USER('${id}')`,(error,rows)=>{
+        conn.query(`CALL GET_MODULE_ACCOUNT_USER('${id1}')`,(error,rows)=>{
          
           
           if (rows) {
