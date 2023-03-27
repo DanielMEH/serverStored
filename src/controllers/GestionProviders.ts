@@ -7,10 +7,10 @@ abstract class ManageProviders{
     public async postProviders(req: Request, res: Response, next: NextFunction): Promise<Response| Request| any> {
 
         try {
-            const productIdCategory:any = req.params.id;
+            const idCategory:any = req.params.id;
             const { name,company, email, phone, address} = req.body;
             const provider:Provider = new ProviderSchema({
-                productIdCategory, name, company, email, phone, address
+                idCategory, name, company, email, phone, address
             });
 
             const prov = await provider.save();
