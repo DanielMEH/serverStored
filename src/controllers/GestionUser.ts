@@ -170,8 +170,7 @@ public async getAdminData(req: any,
       }else
 
       conn.query(`CALL USER_LOGIN('${data.correo}')`,async(error,rows)=>{
-       console.log(error);
-       
+        console.log(rows)
         if (error) return res.status(400).json({message:"ERROR_DB",error:error})
         console.log(rows[0]);
         console.log("Hola");
@@ -188,15 +187,16 @@ public async getAdminData(req: any,
                {expiresIn: 60 * 60 * 24}
              
              );
+
              const token1: any = jwt.sign({id1:rows[0][0].idAccount},
-               SECRET || "authToken",
-               {expiresIn: 60 * 60 * 24}
-             
-             );
+              SECRET || "authToken",
+              {expiresIn: 60 * 60 * 24}
+            
+            );
        
              
-             return res.status(200).json({message:"LOGIN_SUCCESSFULL",token,auth:true,
-           module:modulo,type:"user",token1})
+             return res.status(200).json({message:"LOGIN_SUCCESSFULL",token,token1,auth:true,
+           module:modulo,type:"user"})
              
              
           })
@@ -899,8 +899,13 @@ public async getAdminData(req: any,
     next: Partial<NextFunction>
   ):Promise< Request|Response |any>{
     try {
+
+      console.log(req.body);
+      
       const verifyToken: Array<any> | any = jwt.verify( req.headers["isallowed-x-token"], SECRET )!;
       const { id } = verifyToken;
+      
+      
       if(id){
         const conn = await conexion.connect();
         conn.query(`CALL DELETE_MODULE_USER('${req.body.id}')`,(error,rows)=>{
@@ -1002,8 +1007,6 @@ public async getAdminData(req: any,
     
     try {
       const verifyToken: Array<any> | any = jwt.verify( req.params.id, SECRET )!;
-    
-      
       const { id1 } = verifyToken;
       if(id1){
         const conn = await conexion.connect();
