@@ -9,6 +9,7 @@ import RouterCategory from '../router/router.category'
 import RouterProviders from '../router/router.providers'
 import RoutersPlanificator from "../router/router.planificator";
 import RoutersCompras from "../router/router.compras";
+import RouterInicio from "../router/router.inicio";
 import {connect} from '../database/mongodb'
 mongoose.set('strictQuery', true);
 const AppServer: express.Application = express();
@@ -31,7 +32,12 @@ const startServer = () => {
             console.log( "connection in the port: :", PORT );
         
         } )
-       
+
+        // Here go the Routes Inicio
+
+        AppServer.use(new RouterInicio().GetModules())
+
+       // Here go the Routes User
         AppServer.use(new RouterUser().registerAdmin()); 
         AppServer.use(new RouterUser().registerUser()); 
         AppServer.use(new RouterUser().Login());  
@@ -44,7 +50,7 @@ const startServer = () => {
         AppServer.use(new RouterUser().getUsersAdmin())
         AppServer.use(new RouterUser().UsersDelete())
         AppServer.use(new RouterUser().GetCountUsers())
-        // Here go the Roustes of sydtem control users
+        // Here go the Routes of sydtem control users
         AppServer.use(new RouterUser().GetModuleUsers())
         AppServer.use(new RouterUser().GetPermisions())
         AppServer.use(new RouterUser().UpdateAdmin())

@@ -5,7 +5,7 @@ import { Product } from "../interfaces/product";
 const ProductSchema = new Schema({
   name: { type: String,  },
   iva: Number,
-  tokenIdUser: { type: String, require: true, },
+  tokenIdUser: { type: String, require: true},
   category: String,
   price: Number,
   priceBuy: Number,

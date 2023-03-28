@@ -3,7 +3,8 @@ import {Provider} from '../interfaces/providers';
 
 
 const providerSchema= new Schema({
-    productIdCategory: {type: String, required: true},
+    idCategory: {type: String, required: true},
+    tokenIdUser: {type: String, required: true},
     name: {type: String, required: true},
     company: {type: String, required: true},
     email: {type: String, required: true},

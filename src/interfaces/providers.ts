@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
 
 export interface Provider extends mongoose.Document{
-    productIdCategory: string;
+    idCategory: string;
+    tokenIdUser: string;
     name: string;
     company: string;
     email: string;
