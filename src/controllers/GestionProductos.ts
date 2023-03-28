@@ -76,6 +76,11 @@ abstract class ManageProducts {
       const products: Product[] = await ProductSchema.find({
         tokenIdUser,
       });
+
+     const data = ()=>{
+        products
+      }
+      
      
       return res.status(200).json({ ok: true, products });
     } catch (error) {
