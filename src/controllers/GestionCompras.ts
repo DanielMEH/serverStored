@@ -1,17 +1,20 @@
-import { Request, Response, NextFunction } from "express";
-import CategorySchema from "../models/CategoryM";
-import { category } from "../interfaces/CategoryI";
-import jwt from "jsonwebtoken";
-import { SECRET } from "../config/config"; 
+import { Request, Response, NextFunction } from 'express';
 
-class InventoryProduct {
-
-    public async getInventory(){}
-    public async getInventoryId(){}
-    public async putInventoryId(){}
-    public async deleteInventoryId(){}
-   
+abstract class ManageCompras{
+    public async getCompras(
+        req:Request, res:Response,
+        next:NextFunction
+    ):Promise<Request|Response|any>{
+        try {
+          //  const compras = await ComprasSchema.find();
+           // return res.status(200).json(compras);
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({
+                message: 'Internal server error'
+            });
+        }
+    }
 }
 
-export default InventoryProduct;
-
+export default ManageCompras;

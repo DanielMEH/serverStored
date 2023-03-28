@@ -7,7 +7,8 @@ import RouterUser from "../router/router";
 import RouterProducts from '../router/router.products'
 import RouterCategory from '../router/router.category'
 import RouterProviders from '../router/router.providers'
-import RouterInventory from '../router/router.inventary'
+import RoutersPlanificator from "../router/router.planificator";
+import RoutersCompras from "../router/router.compras";
 import {connect} from '../database/mongodb'
 mongoose.set('strictQuery', true);
 const AppServer: express.Application = express();
@@ -80,13 +81,19 @@ const startServer = () => {
         AppServer.use(new RouterProviders().DeleteProviders())
         AppServer.use(new RouterProviders().GetProvidersProducts())
         // inventory
-        AppServer.use(new RouterInventory().GetInventory())
-        AppServer.use(new RouterInventory().GetInventoryId())
-        AppServer.use(new RouterInventory().DeleteInventoryId())
-        AppServer.use(new RouterInventory().PutInventoryId())
+        // AppServer.use(new RouterInventory().GetInventory())
+        // AppServer.use(new RouterInventory().GetInventoryId())
+        // AppServer.use(new RouterInventory().DeleteInventoryId())
+        // AppServer.use(new RouterInventory().PutInventoryId())
       
 
 
+
+        // Here there are routes Planificator
+        AppServer.use(new RoutersPlanificator().GetPlanificator())
+
+        // Here there are routes Compras
+        AppServer.use(new RoutersCompras().GetCompras())
 
         // Here connect MongoDB
         const con =  connect()
