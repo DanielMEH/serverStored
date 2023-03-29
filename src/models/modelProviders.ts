@@ -10,6 +10,7 @@ const providerSchema= new Schema({
     email: {type: String, required: true},
     phone: {type: Number, required: true},
     address: {type: String, required: true},
+    fecha: {type: String, required: true},
     
 },{
     timestamps:true

@@ -15,7 +15,7 @@ abstract class ManageProviders {
       const tokenCreated: any = req.headers["token"];
       const verifyToken: any = jwt.verify(tokenCreated, SECRET);
       const tokenIdUser = verifyToken.id;
-      const {idCategory, name, company, email, phone, address } = req.body;
+      const {idCategory, name, company, email, phone, address,fecha } = req.body;
       if (!tokenIdUser) {
         return res.status(400).json({
           message: "No existe el token",
