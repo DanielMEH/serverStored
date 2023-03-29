@@ -11,11 +11,11 @@ abstract class ManageProviders {
     next: NextFunction
   ): Promise<Response | Request | any> {
     try {
-      const idCategory: any = req.params.id;
-      const { name, company, email, phone, address } = req.body;
+
       const tokenCreated: any = req.headers["token"];
       const verifyToken: any = jwt.verify(tokenCreated, SECRET);
       const tokenIdUser = verifyToken.id;
+      const {idCategory, name, company, email, phone, address } = req.body;
       if (!tokenIdUser) {
         return res.status(400).json({
           message: "No existe el token",
@@ -23,6 +23,7 @@ abstract class ManageProviders {
       } else {
         const provider: Provider = new ProviderSchema({
           idCategory,
+          tokenIdUser,
           name,
           company,
           email,

@@ -10,7 +10,9 @@ const providerSchema= new Schema({
     email: {type: String, required: true},
     phone: {type: Number, required: true},
     address: {type: String, required: true},
-    timestamps: {type: Boolean, required: true}
+    
+},{
+    timestamps:true
 });
 
 export default model<Provider>('Provider',providerSchema); 
