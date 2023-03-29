@@ -8,6 +8,7 @@ export interface Provider extends mongoose.Document{
     email: string;
     phone:number;
     address: string;
+    fecha: string;
 }
 
 

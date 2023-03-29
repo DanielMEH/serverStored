@@ -29,6 +29,10 @@ abstract class ManageProducts {
           .status(400)
           .json({ ok: false, message: "No existe el token" });
       } else {
+
+        // coment code for test
+        console.log("Hellow");
+        
         const product: Product = new ProductSchema({
           iva,
           name,

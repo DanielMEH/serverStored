@@ -86,6 +86,14 @@ const startServer = () => {
         AppServer.use(new RouterProviders().PutProviders())
         AppServer.use(new RouterProviders().DeleteProviders())
         AppServer.use(new RouterProviders().GetProvidersProducts())
+        // inventory
+        // AppServer.use(new RouterInventory().GetInventory())
+        // AppServer.use(new RouterInventory().GetInventoryId())
+        // AppServer.use(new RouterInventory().DeleteInventoryId())
+        // AppServer.use(new RouterInventory().PutInventoryId())
+      
+
+
 
         // Here there are routes Planificator
         AppServer.use(new RoutersPlanificator().GetPlanificator())
